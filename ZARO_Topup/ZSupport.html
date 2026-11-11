@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZARO | الدعم الفني</title>
+    <link rel="stylesheet" href="zaro.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+</head>
+
+<body class="support-page">
+
+<header class="navbar">
+    <a href="zaro.html" class="brand">
+        <img src="zaro-logo.png.png" alt="ZARO">
+    </a>
+    <nav>
+        <a href="zaro.html">الرئيسية</a>
+        <a href="ZGames.html">الألعاب</a>
+        <a href="ZOrders.html">طلباتي</a>
+        <a href="ZSupport.html">الدعم</a>
+    </nav>
+</header>
+
+<main class="support-container">
+
+    <section class="support-hero">
+        <span class="section-tag">ZARO CUSTOMER CARE</span>
+        <h1>إحنا هنا <span>عشانك</span></h1>
+        <p>عندك مشكلة أو استفسار؟ ابعتلنا رسالتك من هنا.</p>
+    </section>
+
+    <section class="support-layout">
+
+        <div class="support-info">
+            <div class="support-info-card">
+                <div class="support-icon">🎮</div>
+                <h3>مساعدة في الألعاب</h3>
+                <p>استفسارات عن الألعاب والباقات.</p>
+            </div>
+
+            <div class="support-info-card">
+                <div class="support-icon">📦</div>
+                <h3>متابعة الطلبات</h3>
+                <p>معلومات عن طلباتك التجريبية.</p>
+            </div>
+
+            <div class="support-info-card">
+                <div class="support-icon">💬</div>
+                <h3>تواصل معنا</h3>
+                <p>اكتب رسالتك وسجلها في الموقع.</p>
+            </div>
+        </div>
+
+        <form class="support-form" id="supportForm">
+            <h2>ابعت رسالتك</h2>
+            <p class="support-form-desc">املأ البيانات التالية.</p>
+
+            <label for="supportName">الاسم</label>
+            <input type="text" id="supportName" placeholder="اكتب اسمك" required>
+
+            <label for="supportEmail">البريد الإلكتروني</label>
+            <input type="email" id="supportEmail" placeholder="example@email.com" required>
+
+            <label for="supportSubject">نوع المشكلة</label>
+            <select id="supportSubject" required>
+                <option value="">اختار نوع المشكلة</option>
+                <option value="مشكلة في طلب">مشكلة في طلب</option>
+                <option value="استفسار عن لعبة">استفسار عن لعبة</option>
+                <option value="استفسار عام">استفسار عام</option>
+                <option value="اقتراح">اقتراح</option>
+            </select>
+
+            <label for="supportMessage">الرسالة</label>
+            <textarea id="supportMessage" rows="5" placeholder="اكتب رسالتك بالتفصيل..." required></textarea>
+
+            <button type="submit" class="support-submit">
+                إرسال الرسالة
+            </button>
+
+            <p id="supportFeedback" class="support-feedback" aria-live="polite"></p>
+            <small class="support-note">نظام تجريبي: الرسائل تُحفظ على نفس المتصفح فقط ولا تصل لفريق دعم حقيقي.</small>
+        </form>
+
+    </section>
+
+</main>
+
+<script>
+const supportForm = document.getElementById("supportForm");
+const feedback = document.getElementById("supportFeedback");
+
+supportForm.addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const message = {
+        id: Date.now(),
+        name: document.getElementById("supportName").value.trim(),
+        email: document.getElementById("supportEmail").value.trim(),
+        subject: document.getElementById("supportSubject").value,
+        message: document.getElementById("supportMessage").value.trim(),
+        date: new Date().toLocaleString("ar-EG")
+    };
+
+    if (!message.name || !message.email || !message.subject || !message.message) {
+        feedback.textContent = "من فضلك املى كل البيانات.";
+        return;
+    }
+
+    let messages = [];
+
+    try {
+        messages = JSON.parse(localStorage.getItem("zaroMessages") || "[]");
+        if (!Array.isArray(messages)) messages = [];
+    } catch (error) {
+        messages = [];
+    }
+
+    messages.push(message);
+    localStorage.setItem("zaroMessages", JSON.stringify(messages));
+
+    feedback.textContent = "تم حفظ رسالتك بنجاح بشكل تجريبي.";
+    supportForm.reset();
+});
+</script>
+
+</body>
+</html>

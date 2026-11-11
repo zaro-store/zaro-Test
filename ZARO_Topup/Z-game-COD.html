@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZARO | Call of Duty</title>
+    <link rel="stylesheet" href="zaro.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="effects">
+    <div class="light-orb"></div>
+    <div class="grid-overlay"></div>
+</div>
+
+<header class="navbar">
+    <a href="zaro.html" class="brand">
+        <img src="zaro-logo.png.png" alt="ZARO">
+        <span>ZARO</span>
+    </a>
+    <nav class="nav-links">
+        <a href="zaro.html">الرئيسية</a>
+        <a href="ZGames.html" class="active">الألعاب</a>
+        <a href="ZOrders.html">طلباتي</a>
+        <a href="ZSupport.html">الدعم</a>
+    </nav>
+    <a href="ZGames.html" class="nav-button">كل الألعاب</a>
+</header>
+
+<main class="game-details cod-page">
+
+    <section class="game-banner">
+        <div class="game-banner-content">
+            <span class="section-tag">ZARO COMBAT ZONE</span>
+            <h1>CALL OF <span>DUTY</span></h1>
+            <p>جهّز معداتك واختر باقة نقاط CP المناسبة لك.</p>
+            <div class="game-badges">
+                <span>⚔️ COD MOBILE</span>
+                <span><span class="currency-mark cod-mark">CP</span> CP POINTS</span>
+            </div>
+        </div>
+        <div class="game-banner-art">⚔️</div>
+    </section>
+
+    <section class="topup-section">
+        <div class="topup-heading">
+            <span class="section-tag">COMBAT SUPPLY</span>
+            <h2>اشحن نقاط CP</h2>
+            <p>أدخل بيانات حسابك واختر الباقة المطلوبة.</p>
+        </div>
+
+        <div class="topup-layout">
+            <div class="topup-form">
+
+                <div class="form-step">
+                    <span class="step-number">01</span>
+                    <div>
+                        <h3>بيانات اللاعب</h3>
+                        <p>أدخل Player ID الخاص بحسابك</p>
+                    </div>
+                </div>
+
+                <label for="playerId">PLAYER ID</label>
+                <input type="text" id="playerId" placeholder="أدخل Player ID">
+
+                <div class="form-step package-step">
+                    <span class="step-number">02</span>
+                    <div>
+                        <h3>اختر باقة CP</h3>
+                        <p>حدد عدد النقاط المطلوبة</p>
+                    </div>
+                </div>
+
+                <div class="diamond-packages">
+
+                    <button class="diamond-card" type="button" data-package="80 CP">
+                        <span class="diamond-icon currency-mark cod-mark">CP</span>
+                        <strong>80</strong><small>CP</small><b>اختيار الباقة</b>
+                    </button>
+
+                    <button class="diamond-card" type="button" data-package="420 CP">
+                        <span class="diamond-icon currency-mark cod-mark">CP</span>
+                        <strong>420</strong><small>CP</small><b>اختيار الباقة</b>
+                    </button>
+
+                    <button class="diamond-card" type="button" data-package="880 CP">
+                        <span class="diamond-icon currency-mark cod-mark">CP</span>
+                        <strong>880</strong><small>CP</small><b>اختيار الباقة</b>
+                    </button>
+
+                    <button class="diamond-card" type="button" data-package="2400 CP">
+                        <span class="diamond-icon currency-mark cod-mark">CP</span>
+                        <strong>2400</strong><small>CP</small><b>اختيار الباقة</b>
+                    </button>
+
+                    <button class="diamond-card" type="button" data-package="5000 CP">
+                        <span class="diamond-icon currency-mark cod-mark">CP</span>
+                        <strong>5000</strong><small>CP</small><b>اختيار الباقة</b>
+                    </button>
+
+                    <button class="diamond-card" type="button" data-package="10800 CP">
+                        <span class="diamond-icon currency-mark cod-mark">CP</span>
+                        <strong>10800</strong><small>CP</small><b>اختيار الباقة</b>
+                    </button>
+
+                </div>
+
+                <div class="order-summary">
+                    <div>
+                        <span>الباقة المختارة</span>
+                        <strong id="selectedPackage">لم يتم الاختيار</strong>
+                    </div>
+                    <div>
+                        <span>السعر</span>
+                        <strong id="selectedPrice">يحدد لاحقًا</strong>
+                    </div>
+                </div>
+
+                <button class="confirm-order" id="confirmOrder" type="button">
+                    تسجيل طلب تجريبي <span>←</span>
+                </button>
+
+                <p class="demo-notice">
+                    هذه نسخة تجريبية. لا يوجد دفع أو شحن حقيقي حاليًا.
+                    سيتم تحديد الأسعار بعد الاتفاق مع مورد.
+                </p>
+            </div>
+
+            <aside class="topup-side">
+                <div class="side-icon"><span class="currency-mark cod-mark">CP</span></div>
+                <span class="section-tag">ZARO COMBAT ZONE</span>
+                <h3>ENTER THE<br>BATTLEFIELD.</h3>
+                <p>اختر باقتك وراجع بيانات حسابك قبل تسجيل الطلب التجريبي.</p>
+                <a href="ZSupport.html">تحتاج مساعدة؟</a>
+            </aside>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="footer-brand">ZARO<span>.</span></div>
+    <p>YOUR GAME. YOUR WORLD.</p>
+    <small>© 2026 ZARO. All Rights Reserved.</small>
+</footer>
+
+<script src="zaro.js"></script>
+
+<script>
+const SUPABASE_URL =
+    "https://rtqdcbkttrxbmglzllmv.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_iqwtKiJMmx9QEO4l1Zo7iQ_kHvZZH0c";
+
+const packageCards = document.querySelectorAll(".diamond-card");
+const selectedPackage = document.getElementById("selectedPackage");
+const selectedPrice = document.getElementById("selectedPrice");
+const confirmOrder = document.getElementById("confirmOrder");
+
+let currentPackage = "";
+
+packageCards.forEach(card => {
+    card.addEventListener("click", () => {
+        packageCards.forEach(item => item.classList.remove("selected"));
+        card.classList.add("selected");
+
+        currentPackage = card.dataset.package;
+
+        selectedPackage.textContent = currentPackage;
+        selectedPrice.textContent = "يحدد لاحقًا";
+    });
+});
+
+confirmOrder.addEventListener("click", async () => {
+
+    const playerId = document.getElementById("playerId").value.trim();
+
+    if (!playerId) {
+        alert("من فضلك أدخل Player ID");
+        return;
+    }
+
+    if (!currentPackage) {
+        alert("من فضلك اختر باقة أولاً");
+        return;
+    }
+
+    confirmOrder.disabled = true;
+    confirmOrder.textContent = "جاري تسجيل الطلب...";
+
+    try {
+        const response = await fetch(
+            `${SUPABASE_URL}/functions/v1/create-order`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "apikey": SUPABASE_KEY
+                },
+                body: JSON.stringify({
+                    playerId: playerId,
+                    game: "Call of Duty Mobile",
+                    package: currentPackage
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || "فشل تسجيل الطلب");
+        }
+
+        const orders = JSON.parse(
+            localStorage.getItem("zaroOrders") || "[]"
+        );
+
+        orders.push({
+            id: result.orderId,
+            game: "Call of Duty Mobile",
+            playerId: playerId,
+            package: currentPackage,
+            price: null,
+            status: "طلب تجريبي",
+            date: new Date().toLocaleString("ar-EG")
+        });
+
+        localStorage.setItem("zaroOrders", JSON.stringify(orders));
+
+        alert("تم تسجيل طلبك التجريبي بنجاح!");
+        window.location.href = "ZOrders.html";
+
+    } catch (error) {
+        console.error("ZARO Order Error:", error);
+        alert("حصلت مشكلة أثناء تسجيل الطلب. حاول مرة أخرى.");
+    } finally {
+        confirmOrder.disabled = false;
+        confirmOrder.innerHTML = 'تسجيل طلب تجريبي <span>←</span>';
+    }
+});
+</script>
+
+</body>
+</html>
+

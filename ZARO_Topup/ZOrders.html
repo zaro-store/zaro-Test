@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZARO | طلباتي</title>
+    <link rel="stylesheet" href="zaro.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+</head>
+
+<body class="orders-page">
+
+<header class="navbar">
+    <a href="zaro.html" class="brand">
+        <img src="zaro-logo.png.png" alt="ZARO">
+    </a>
+    <nav>
+        <a href="zaro.html">الرئيسية</a>
+        <a href="ZGames.html">الألعاب</a>
+        <a href="ZOrders.html">طلباتي</a>
+        <a href="ZSupport.html">الدعم</a>
+    </nav>
+</header>
+
+<main class="orders-container">
+    <section class="orders-heading">
+        <span class="section-tag">ZARO ACCOUNT</span>
+        <h1>طلباتي</h1>
+        <p>تابع طلباتك التجريبية من مكان واحد.</p>
+    </section>
+
+    <div class="orders-stats">
+        <div class="orders-stat">
+            <span>إجمالي الطلبات</span>
+            <strong id="totalOrders">0</strong>
+        </div>
+        <div class="orders-stat">
+            <span>طلبات تجريبية</span>
+            <strong id="demoOrders">0</strong>
+        </div>
+    </div>
+
+    <section id="ordersList" class="orders-list"></section>
+
+    <div id="emptyOrders" class="empty-orders" hidden>
+        <div>📦</div>
+        <h2>لسه مفيش طلبات</h2>
+        <p>لما تختار لعبة وتعمل طلب تجريبي، هيظهر هنا.</p>
+        <a href="ZGames.html">اكتشف الألعاب</a>
+    </div>
+
+    <button id="clearOrders" class="clear-orders" hidden>
+        مسح كل الطلبات
+    </button>
+</main>
+
+<script>
+const ordersList = document.getElementById("ordersList");
+const emptyOrders = document.getElementById("emptyOrders");
+const totalOrders = document.getElementById("totalOrders");
+const demoOrders = document.getElementById("demoOrders");
+const clearOrders = document.getElementById("clearOrders");
+
+function loadOrders() {
+    let orders = [];
+
+    try {
+        orders = JSON.parse(localStorage.getItem("zaroOrders") || "[]");
+        if (!Array.isArray(orders)) orders = [];
+    } catch (error) {
+        orders = [];
+    }
+
+    ordersList.innerHTML = "";
+
+    totalOrders.textContent = orders.length;
+    demoOrders.textContent = orders.length;
+
+    emptyOrders.hidden = orders.length !== 0;
+    clearOrders.hidden = orders.length === 0;
+
+    orders.forEach((order, index) => {
+        const card = document.createElement("article");
+        card.className = "order-card";
+
+        const details = document.createElement("div");
+        details.className = "order-card-details";
+
+        const title = document.createElement("h3");
+        title.textContent = order.game || "لعبة غير محددة";
+
+        const packageInfo = document.createElement("p");
+        packageInfo.textContent = "الباقة: " + (order.package || "غير محددة");
+
+        const playerInfo = document.createElement("p");
+        playerInfo.textContent = "Player ID: " + (order.playerId || "غير متوفر");
+
+        details.append(title, packageInfo, playerInfo);
+
+        if (order.zoneId) {
+            const zoneInfo = document.createElement("p");
+            zoneInfo.textContent = "Zone ID: " + order.zoneId;
+            details.appendChild(zoneInfo);
+        }
+
+        const priceInfo = document.createElement("p");
+        priceInfo.textContent = "السعر: " + (order.price || "تجريبي");
+
+        const status = document.createElement("span");
+        status.className = "order-status";
+        status.textContent = order.status || "طلب تجريبي";
+
+        const date = document.createElement("small");
+        date.textContent = order.date || "";
+
+        const removeButton = document.createElement("button");
+        removeButton.className = "remove-order";
+        removeButton.textContent = "حذف الطلب";
+        removeButton.addEventListener("click", () => {
+            const updatedOrders = JSON.parse(
+                localStorage.getItem("zaroOrders") || "[]"
+            );
+            updatedOrders.splice(index, 1);
+            localStorage.setItem("zaroOrders", JSON.stringify(updatedOrders));
+            loadOrders();
+        });
+
+        card.append(details, priceInfo, status, date, removeButton);
+        ordersList.appendChild(card);
+    });
+}
+
+clearOrders.addEventListener("click", () => {
+    if (confirm("متأكد إنك عايز تمسح كل الطلبات؟")) {
+        localStorage.removeItem("zaroOrders");
+        loadOrders();
+    }
+});
+
+loadOrders();
+</script>
+
+</body>
+</html>

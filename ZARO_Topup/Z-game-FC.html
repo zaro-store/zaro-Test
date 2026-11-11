@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZARO | FC Mobile</title>
+    <link rel="stylesheet" href="zaro.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+</head>
+<body class="game-page fc-page">
+
+<header class="navbar">
+    <a href="zaro.html" class="brand">
+        <img src="zaro-logo.png.png" alt="ZARO">
+    </a>
+    <nav class="nav-links">
+        <a href="zaro.html">الرئيسية</a>
+        <a href="ZGames.html">الألعاب</a>
+        <a href="ZOrders.html">طلباتي</a>
+        <a href="ZSupport.html">الدعم</a>
+    </nav>
+    <a href="ZGames.html" class="nav-button">كل الألعاب</a>
+</header>
+
+<main>
+    <section class="game-banner">
+        <div class="game-details">
+            <span class="section-tag">ZARO GAMING STORE</span>
+            <h1>FC MOBILE</h1>
+            <p>اشحن نقاط FC واستعد للسيطرة على الملعب.</p>
+        </div>
+        <div class="game-icon"><span class="currency-mark fc-mark">FC</span></div>
+    </section>
+
+    <section class="topup-section">
+        <div class="topup-heading">
+            <span class="section-tag">FC POINTS</span>
+            <h2>اختار باقتك</h2>
+            <p>حدد الباقة المناسبة ليك وأدخل بيانات حسابك.</p>
+        </div>
+
+        <div class="topup-layout">
+            <div class="topup-form">
+                <label for="playerId">Player ID</label>
+                <input type="text" id="playerId" placeholder="اكتب Player ID" required>
+
+                <h3>باقات FC Points</h3>
+
+                <div class="diamond-packages">
+                    <button class="diamond-card" type="button" data-package="40 FC Points" data-price="تجريبي">
+                        <span class="currency-mark fc-mark">FC</span>
+                        <strong>40</strong>
+                        <small>FC Points</small>
+                    </button>
+
+                    <button class="diamond-card" type="button" data-package="100 FC Points" data-price="تجريبي">
+                        <span class="currency-mark fc-mark">FC</span>
+                        <strong>100</strong>
+                        <small>FC Points</small>
+                    </button>
+
+                    <button class="diamond-card" type="button" data-package="520 FC Points" data-price="تجريبي">
+                        <span class="currency-mark fc-mark">FC</span>
+                        <strong>520</strong>
+                        <small>FC Points</small>
+                    </button>
+
+                    <button class="diamond-card" type="button" data-package="1070 FC Points" data-price="تجريبي">
+                        <span class="currency-mark fc-mark">FC</span>
+                        <strong>1070</strong>
+                        <small>FC Points</small>
+                    </button>
+
+                    <button class="diamond-card" type="button" data-package="2200 FC Points" data-price="تجريبي">
+                        <span class="currency-mark fc-mark">FC</span>
+                        <strong>2200</strong>
+                        <small>FC Points</small>
+                    </button>
+
+                    <button class="diamond-card" type="button" data-package="5750 FC Points" data-price="تجريبي">
+                        <span class="currency-mark fc-mark">FC</span>
+                        <strong>5750</strong>
+                        <small>FC Points</small>
+                    </button>
+                </div>
+            </div>
+
+            <aside class="topup-side">
+                <div class="order-summary">
+                    <h3>ملخص الطلب</h3>
+                    <div>
+                        <span>اللعبة</span>
+                        <strong>FC Mobile</strong>
+                    </div>
+                    <div>
+                        <span>الباقة</span>
+                        <strong id="selectedPackage">لم يتم الاختيار</strong>
+                    </div>
+                    <div>
+                        <span>السعر</span>
+                        <strong id="selectedPrice">غير محدد</strong>
+                    </div>
+                    <button class="confirm-order" id="confirmOrder" type="button">
+                        تأكيد الطلب
+                    </button>
+                    <p class="demo-note">نظام تجريبي، لا يوجد دفع أو شحن حقيقي حاليًا.</p>
+                </div>
+            </aside>
+        </div>
+    </section>
+</main>
+
+<script>
+const SUPABASE_URL = "https://rtqdcbkttrxbmglzllmv.supabase.co";
+const SUPABASE_KEY = "sb_publishable_iqwtKiJMmx9QEO4l1Zo7iQ_kHvZZH0c";
+
+let selectedPackage = "";
+let selectedPrice = "";
+
+const cards = document.querySelectorAll(".diamond-card");
+const confirmButton = document.getElementById("confirmOrder");
+
+cards.forEach(card => {
+    card.addEventListener("click", () => {
+        cards.forEach(item => item.classList.remove("selected"));
+        card.classList.add("selected");
+
+        selectedPackage = card.dataset.package;
+        selectedPrice = card.dataset.price;
+
+        document.getElementById("selectedPackage").textContent = selectedPackage;
+        document.getElementById("selectedPrice").textContent = selectedPrice;
+    });
+});
+
+confirmButton.addEventListener("click", async () => {
+    const playerId = document.getElementById("playerId").value.trim();
+
+    if (!playerId || !selectedPackage) {
+        alert("اكتب Player ID واختار الباقة الأول.");
+        return;
+    }
+
+    if (playerId.length < 3 || playerId.length > 40) {
+        alert("تأكد من صحة Player ID.");
+        return;
+    }
+
+    confirmButton.disabled = true;
+    confirmButton.textContent = "جاري إرسال الطلب...";
+
+    try {
+        const response = await fetch(
+            `${SUPABASE_URL}/functions/v1/create-order`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "apikey": SUPABASE_KEY
+                },
+                body: JSON.stringify({
+                    playerId: playerId,
+                    game: "FC Mobile",
+                    package: selectedPackage
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || "تعذر إرسال الطلب");
+        }
+
+        const orders = JSON.parse(localStorage.getItem("zaroOrders") || "[]");
+
+        orders.push({
+            id: result.orderId,
+            game: "FC Mobile",
+            playerId: playerId,
+            package: selectedPackage,
+            price: selectedPrice,
+            status: "طلب تجريبي",
+            date: new Date().toLocaleString("ar-EG")
+        });
+
+        localStorage.setItem("zaroOrders", JSON.stringify(orders));
+
+        alert("تم إرسال طلبك التجريبي بنجاح!");
+        window.location.href = "ZOrders.html";
+
+    } catch (error) {
+        console.error("ZARO Order Error:", error);
+        alert("حصل خطأ أثناء إرسال الطلب. حاول مرة تانية.");
+        confirmButton.disabled = false;
+        confirmButton.textContent = "تأكيد الطلب";
+    }
+});
+</script>
+
+</body>
+</html>
