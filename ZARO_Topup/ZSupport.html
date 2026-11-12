@@ -143,6 +143,11 @@ replyForm.addEventListener("submit",async e=>{
  replyInput.value="";replyFeedback.textContent="تم إرسال رسالتك.";await refreshConversation();
 });
 $("refreshCustomerConversation").addEventListener("click",refreshConversation);
+
+// Automatically check for new support replies every five seconds.
+setInterval(() => {
+ if (access && !document.hidden) refreshConversation();
+}, 5000);
 </script>
 
 </body>
