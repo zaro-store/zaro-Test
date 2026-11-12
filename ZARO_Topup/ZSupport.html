@@ -7,7 +7,15 @@
     <title>ZARO | الدعم الفني</title>
     <link rel="stylesheet" href="zaro.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
-</head>
+<style>
+.customer-conversation{margin-top:22px;padding:15px;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(10,12,18,.65)}
+.customer-conversation-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.customer-conversation-head h3{margin:0;font-size:15px}.customer-conversation-head small{display:block;color:#a4aab5;margin-top:5px;font-size:11px}
+.customer-conversation-messages{display:flex;flex-direction:column;gap:10px;max-height:340px;overflow:auto;padding:15px 0}
+.customer-chat-message{max-width:90%;padding:11px 13px;border-radius:12px;background:#20242d;align-self:flex-start}.customer-chat-message.from-admin{align-self:flex-end;background:rgba(255,104,31,.13)}
+.customer-chat-message b{font-size:10px;color:#ff985d}.customer-chat-message p{font-size:12px;line-height:1.8;margin:6px 0;overflow-wrap:anywhere}.customer-chat-message small{font-size:9px;color:#999}
+.customer-reply-form textarea{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:#101219;color:white;font:12px Cairo,sans-serif;resize:vertical}
+.customer-reply-form button:disabled{opacity:.5}.support-submit.secondary{padding:8px 12px;font-size:11px}
+</style></head>
 
 <body class="support-page">
 
@@ -80,49 +88,61 @@
             </button>
 
             <p id="supportFeedback" class="support-feedback" aria-live="polite"></p>
-            <small class="support-note">نظام تجريبي: الرسائل تُحفظ على نفس المتصفح فقط ولا تصل لفريق دعم حقيقي.</small>
+            <small class="support-note">تابع رد فريق ZARO من نفس الصفحة وعلى نفس الجهاز.</small>
+<section class="customer-conversation" id="customerConversation" hidden>
+<div class="customer-conversation-head"><div><h3 id="customerConversationTitle">محادثة الدعم</h3><small id="customerConversationStatus">بانتظار الرد</small></div><button type="button" id="refreshCustomerConversation" class="support-submit secondary">تحديث</button></div>
+<div id="customerConversationMessages" class="customer-conversation-messages"></div>
+<form id="customerReplyForm" class="customer-reply-form"><textarea id="customerReply" rows="3" placeholder="اكتب ردك هنا..." required></textarea><button type="submit" class="support-submit">إرسال الرد</button><p id="customerReplyFeedback" class="support-feedback" aria-live="polite"></p></form>
+</section>
         </form>
 
     </section>
 
 </main>
 
-<script>
-const supportForm = document.getElementById("supportForm");
-const feedback = document.getElementById("supportFeedback");
-
-supportForm.addEventListener("submit", function(event) {
-    event.preventDefault();
-
-    const message = {
-        id: Date.now(),
-        name: document.getElementById("supportName").value.trim(),
-        email: document.getElementById("supportEmail").value.trim(),
-        subject: document.getElementById("supportSubject").value,
-        message: document.getElementById("supportMessage").value.trim(),
-        date: new Date().toLocaleString("ar-EG")
-    };
-
-    if (!message.name || !message.email || !message.subject || !message.message) {
-        feedback.textContent = "من فضلك املى كل البيانات.";
-        return;
-    }
-
-    let messages = [];
-
-    try {
-        messages = JSON.parse(localStorage.getItem("zaroMessages") || "[]");
-        if (!Array.isArray(messages)) messages = [];
-    } catch (error) {
-        messages = [];
-    }
-
-    messages.push(message);
-    localStorage.setItem("zaroMessages", JSON.stringify(messages));
-
-    feedback.textContent = "تم حفظ رسالتك بنجاح بشكل تجريبي.";
-    supportForm.reset();
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+const supabase=createClient("https://rtqdcbkttrxbmglzllmv.supabase.co","sb_publishable_iqwtKiJMmx9QEO4l1Zo7iQ_kHvZZH0c");
+const $=id=>document.getElementById(id);
+const form=$("supportForm"), feedback=$("supportFeedback"), panel=$("customerConversation"), messages=$("customerConversationMessages"), replyForm=$("customerReplyForm"), replyInput=$("customerReply"), replyFeedback=$("customerReplyFeedback");
+const STORAGE_KEY="zaroSupportAccess"; let access=null;
+const esc=v=>String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+function makeToken(){const bytes=new Uint8Array(32);crypto.getRandomValues(bytes);return Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");}
+function showConversation(data){
+ const t=data.ticket;
+ $("customerConversationTitle").textContent="محادثة الدعم · "+t.subject;
+ $("customerConversationStatus").textContent=t.status==="closed"?"مغلقة":t.status==="answered"?"تم الرد":"بانتظار الرد";
+ messages.innerHTML=(data.messages||[]).map(m=>'<article class="customer-chat-message '+(m.sender_role==="admin"?"from-admin":"from-customer")+'"><b>'+(m.sender_role==="admin"?"ZARO Support":"أنت")+'</b><p>'+esc(m.body).replace(/\\n/g,"<br>")+'</p><small>'+new Date(m.created_at).toLocaleString("ar-EG")+'</small></article>').join("");
+ replyInput.disabled=t.status==="closed"; replyForm.querySelector("button").disabled=t.status==="closed"; panel.hidden=false;
+}
+async function refreshConversation(){
+ if(!access)return;
+ const {data,error}=await supabase.rpc("zaro_get_customer_conversation",{p_ticket_id:access.ticketId,p_token:access.token});
+ if(error){messages.textContent="تعذر تحميل المحادثة: "+error.message;return;}
+ showConversation(data);
+}
+try{access=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");if(access?.ticketId&&access?.token)refreshConversation();}catch{access=null;}
+form.addEventListener("submit",async e=>{
+ e.preventDefault();
+ const name=$("supportName").value.trim(),email=$("supportEmail").value.trim(),subject=$("supportSubject").value,body=$("supportMessage").value.trim();
+ if(!name||!email||!subject||!body){feedback.textContent="من فضلك املى كل البيانات.";return;}
+ const button=form.querySelector('button[type="submit"]');button.disabled=true;feedback.textContent="جاري إرسال رسالتك...";
+ const token=makeToken();
+ const {data:ticketId,error}=await supabase.rpc("zaro_create_support_ticket",{p_name:name,p_email:email,p_subject:subject,p_body:body,p_token:token});
+ button.disabled=false;
+ if(error){feedback.textContent="تعذر إرسال الرسالة: "+error.message;console.error(error);return;}
+ access={ticketId,token};localStorage.setItem(STORAGE_KEY,JSON.stringify(access));form.reset();
+ feedback.textContent="تم إرسال رسالتك. احتفظ بنفس المتصفح لمتابعة المحادثة والرد.";
+ await refreshConversation();
 });
+replyForm.addEventListener("submit",async e=>{
+ e.preventDefault();if(!access)return;const body=replyInput.value.trim();if(!body)return;
+ const button=replyForm.querySelector("button");button.disabled=true;replyFeedback.textContent="جاري إرسال ردك...";
+ const {error}=await supabase.rpc("zaro_send_customer_message",{p_ticket_id:access.ticketId,p_token:access.token,p_body:body});
+ button.disabled=false;if(error){replyFeedback.textContent="تعذر إرسال الرد: "+error.message;return;}
+ replyInput.value="";replyFeedback.textContent="تم إرسال رسالتك.";await refreshConversation();
+});
+$("refreshCustomerConversation").addEventListener("click",refreshConversation);
 </script>
 
 </body>
