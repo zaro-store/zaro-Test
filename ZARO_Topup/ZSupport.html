@@ -62,7 +62,7 @@
     <button type="button" data-help="package">اختيار باقة</button>
     <button type="button" data-help="human">التواصل مع الإدارة</button>
   </div>
-  <form class="zaro-helpbot-input" id="helpBotInputForm" hidden><input id="helpBotInput" type="text" maxlength="120" placeholder="اكتب رقم الطلب..." autocomplete="off"><button type="submit">إرسال</button></form>
+  <form class="zaro-helpbot-input" id="helpBotInputForm"><input id="helpBotInput" type="text" maxlength="500" placeholder="اكتب سؤالك هنا..." autocomplete="off" required><button type="submit">إرسال</button></form>
   <small class="zaro-helpbot-note">المساعد ده بيرد بإرشادات جاهزة، ومش بيغيّر الطلبات أو ينفّذ عمليات دفع. تقدر تحوّل أي مشكلة لفريق ZARO من نموذج الدعم.</small>
 </section>
 
@@ -180,15 +180,41 @@ helpBotOptions?.addEventListener("click", event => {
     if(key==="human") $("supportForm").scrollIntoView({behavior:"smooth",block:"center"});
   }
 });
+function normalizeHelpText(value){
+  return String(value||"").toLowerCase().replace(/[ًٌٍَُِّْـ]/g,"").replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").trim();
+}
+function getHelpReply(raw){
+  const q=normalizeHelpText(raw);
+  const rules=[
+    {keys:["السلام عليكم","مرحبا","اهلا","هاي","hello"],reply:"أهلًا بيك في ZARO! 🎮 اكتب سؤالك أو اختار نوع المشكلة من الأزرار، وأنا هحاول أساعدك."},
+    {keys:["طلبي","الطلب","اوردر","order","رقم الطلب","اتابع"],reply:"لمتابعة طلبك، افتح صفحة «طلباتي» وراجع حالة الطلب. لو محتاج مراجعة من الإدارة، ابعت رقم الطلب من نموذج الدعم."},
+    {keys:["اتأخر","متاخر","تاخير","مستلمتش","موصلش","فين الشحن","الشحن"],reply:"بنعتذر عن التأخير. راجع حالة الطلب في صفحة «طلباتي»، وجهّز رقم الطلب وابعته للإدارة من نموذج الدعم عشان تراجعه."},
+    {keys:["دفع","فلوس","خصم","اتخصم","فيزا","بطاقه","رفض","فشل"],reply:"لو المبلغ اتخصم ولم يظهر طلبك، ما تكررش الدفع. احتفظ بإثبات العملية وابعت رقم الطلب أو تفاصيل المشكلة للإدارة. ما تبعتش رقم البطاقة أو رمز OTP."},
+    {keys:["player id","ايدي","id غلط","معرف اللاعب","رقم اللاعب"],reply:"راجع Player ID من داخل اللعبة قبل تأكيد الطلب. لو الطلب اتبعت بالفعل، تواصل مع الإدارة بسرعة لمراجعة الحالة."},
+    {keys:["باقة","الباقه","اختار","اختيار","دايموند","الماسات","uc","cp","روبوكس"],reply:"اختار اللعبة أولًا، وبعدها قارن كمية العملات والسعر المعروض قبل تأكيد الطلب. لو محتار بين باقتين، اكتب اسم اللعبة والباقة."},
+    {keys:["استرجاع","ارجاع","الغاء","إلغاء","refund"],reply:"طلبات الإلغاء أو الاسترجاع بتحتاج مراجعة من الإدارة حسب حالة الطلب. ابعت رقم الطلب وسبب طلبك من نموذج الدعم."},
+    {keys:["مشكله","مساعدة","مساعده","موظف","انسان","الاداره","الإدارة","دعم"],reply:"تقدر تتواصل مع فريق ZARO من نموذج الدعم أسفل الصفحة. اكتب اسمك وإيميلك وتفاصيل المشكلة، وهتظهر في لوحة الإدارة."}
+  ];
+  const match=rules.find(rule=>rule.keys.some(key=>q.includes(normalizeHelpText(key))));
+  return match?.reply || "مش قادر أحدد إجابة دقيقة لسؤالك من قاعدة المساعدة الحالية. جهزت لك تحويله لفريق ZARO، راجع الرسالة في نموذج الدعم وابعتها عشان الإدارة تتابعها.";
+}
 helpBotInputForm?.addEventListener("submit", event => {
   event.preventDefault();
-  const orderNo=helpBotInput.value.trim();
-  if(!orderNo)return;
-  addHelpBotMessage(orderNo,"user");
-  addHelpBotMessage("جهزت لك نموذج التواصل. راجع البيانات واكتب اسمك وإيميلك، وبعدها ابعت الرسالة للإدارة.");
-  helpBotWaitingForOrder=false;
-  helpBotInputForm.hidden=true;
-  routeToSupport("مشكلة في طلب","أحتاج متابعة الطلب رقم: "+orderNo);
+  const question=helpBotInput.value.trim();
+  if(!question)return;
+  addHelpBotMessage(question,"user");
+  if(helpBotWaitingForOrder){
+    addHelpBotMessage("لمتابعة حالة الطلب مباشرة، راجع صفحة «طلباتي». جهزت رسالة للإدارة برقم الطلب عشان تقدر تتابع معاك.");
+    helpBotWaitingForOrder=false;
+    routeToSupport("مشكلة في طلب","أحتاج متابعة الطلب رقم: "+question);
+  } else {
+    const reply=getHelpReply(question);
+    addHelpBotMessage(reply);
+    if(reply.startsWith("مش قادر أحدد")){
+      routeToSupport("استفسار عام","سؤال العميل: "+question+"\nأحتاج مساعدة من فريق ZARO.");
+    }
+  }
+  helpBotInput.value="";
 });
 
 function makeToken(){const bytes=new Uint8Array(32);crypto.getRandomValues(bytes);return Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");}
