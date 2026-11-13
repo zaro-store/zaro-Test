@@ -3220,3 +3220,41 @@ h1, h2, h3, p, span, a, strong, small {
         text-align: center;
     }
 }
+
+
+/* ZARO ACCOUNT NAV ICON - visible on desktop and mobile */
+.nav-links .account-nav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: #f5f3ef;
+  white-space: nowrap;
+}
+.nav-links .account-nav-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  border: 1px solid rgba(255,138,54,.65);
+  border-radius: 50%;
+  background: rgba(255,91,22,.12);
+  font-size: 15px;
+  line-height: 1;
+}
+.nav-links .account-nav-link:hover .account-nav-icon {
+  background: #ff5b16;
+  border-color: #ff5b16;
+}
+@media (max-width: 600px) {
+  .navbar .nav-links .account-nav-link {
+    display: inline-flex;
+    font-size: 11px;
+    gap: 5px;
+  }
+  .navbar .nav-links .account-nav-icon {
+    width: 25px;
+    height: 25px;
+    font-size: 14px;
+  }
+}
