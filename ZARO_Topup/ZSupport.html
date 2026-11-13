@@ -15,6 +15,17 @@
 .customer-chat-message b{font-size:10px;color:#ff985d}.customer-chat-message p{font-size:12px;line-height:1.8;margin:6px 0;overflow-wrap:anywhere}.customer-chat-message small{font-size:9px;color:#999}
 .customer-reply-form textarea{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:#101219;color:white;font:12px Cairo,sans-serif;resize:vertical}
 .customer-reply-form button:disabled{opacity:.5}.support-submit.secondary{padding:8px 12px;font-size:11px}
+
+/* ZARO free guided support assistant */
+.zaro-helpbot{margin:22px auto 28px;max-width:920px;padding:22px;border:1px solid rgba(255,130,55,.28);border-radius:20px;background:linear-gradient(145deg,rgba(28,31,42,.96),rgba(12,14,20,.96));box-shadow:0 18px 55px rgba(0,0,0,.22)}
+.zaro-helpbot-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}.zaro-helpbot-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:rgba(255,116,45,.14);font-size:23px}.zaro-helpbot-head h2{margin:0;font-size:19px}.zaro-helpbot-head p{margin:3px 0 0;color:#aeb4c0;font-size:12px}
+.zaro-helpbot-messages{min-height:100px;max-height:280px;overflow:auto;display:flex;flex-direction:column;gap:9px;padding:12px 2px}
+.zaro-helpbot-msg{max-width:88%;padding:11px 14px;border-radius:14px;background:#252a35;color:#f4f5f7;font-size:13px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
+.zaro-helpbot-msg.user{align-self:flex-start;background:rgba(255,116,45,.17);border:1px solid rgba(255,116,45,.18)}
+.zaro-helpbot-options{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.zaro-helpbot-options button,.zaro-helpbot-input button{border:1px solid rgba(255,130,55,.35);background:rgba(255,116,45,.1);color:#ffd0b5;padding:9px 13px;border-radius:999px;font:700 12px Cairo,sans-serif;cursor:pointer}.zaro-helpbot-options button:hover,.zaro-helpbot-input button:hover{background:rgba(255,116,45,.22)}
+.zaro-helpbot-input{display:flex;gap:8px;margin-top:12px}.zaro-helpbot-input input{min-width:0;flex:1;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.14);background:#10131a;color:white;font:13px Cairo,sans-serif}
+.zaro-helpbot-note{display:block;margin-top:12px;color:#9299a6;font-size:10px;line-height:1.7}
+
 </style></head>
 
 <body class="support-page">
@@ -39,7 +50,23 @@
         <p>عندك مشكلة أو استفسار؟ ابعتلنا رسالتك من هنا.</p>
     </section>
 
-    <section class="support-layout">
+    
+<section class="zaro-helpbot" aria-label="مساعد ZARO">
+  <div class="zaro-helpbot-head"><div class="zaro-helpbot-icon">✦</div><div><h2>ZARO Help Assistant</h2><p>مساعد فوري للأسئلة الشائعة، بدون انتظار</p></div></div>
+  <div class="zaro-helpbot-messages" id="helpBotMessages" aria-live="polite"><div class="zaro-helpbot-msg">أهلًا بيك في ZARO! اختار المشكلة اللي محتاج مساعدة فيها، وأنا هوجّهك للخطوة المناسبة.</div></div>
+  <div class="zaro-helpbot-options" id="helpBotOptions">
+    <button type="button" data-help="order">متابعة طلب</button>
+    <button type="button" data-help="payment">مشكلة في الدفع</button>
+    <button type="button" data-help="delay">الطلب اتأخر</button>
+    <button type="button" data-help="player">خطأ في Player ID</button>
+    <button type="button" data-help="package">اختيار باقة</button>
+    <button type="button" data-help="human">التواصل مع الإدارة</button>
+  </div>
+  <form class="zaro-helpbot-input" id="helpBotInputForm" hidden><input id="helpBotInput" type="text" maxlength="120" placeholder="اكتب رقم الطلب..." autocomplete="off"><button type="submit">إرسال</button></form>
+  <small class="zaro-helpbot-note">المساعد ده بيرد بإرشادات جاهزة، ومش بيغيّر الطلبات أو ينفّذ عمليات دفع. تقدر تحوّل أي مشكلة لفريق ZARO من نموذج الدعم.</small>
+</section>
+
+<section class="support-layout">
 
         <div class="support-info">
             <div class="support-info-card">
@@ -107,6 +134,63 @@ const $=id=>document.getElementById(id);
 const form=$("supportForm"), feedback=$("supportFeedback"), panel=$("customerConversation"), messages=$("customerConversationMessages"), replyForm=$("customerReplyForm"), replyInput=$("customerReply"), replyFeedback=$("customerReplyFeedback");
 const STORAGE_KEY="zaroSupportAccess"; let access=null;
 const esc=v=>String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+
+const helpBotMessages = $("helpBotMessages");
+const helpBotOptions = $("helpBotOptions");
+const helpBotInputForm = $("helpBotInputForm");
+const helpBotInput = $("helpBotInput");
+let helpBotWaitingForOrder = false;
+function addHelpBotMessage(text, who="bot") {
+  const item=document.createElement("div");
+  item.className="zaro-helpbot-msg"+(who==="user"?" user":"");
+  item.textContent=text;
+  helpBotMessages.appendChild(item);
+  helpBotMessages.scrollTop=helpBotMessages.scrollHeight;
+}
+function routeToSupport(subject, message) {
+  $("supportSubject").value=subject;
+  $("supportMessage").value=message;
+  $("supportForm").scrollIntoView({behavior:"smooth",block:"center"});
+  $("supportName").focus({preventScroll:true});
+}
+helpBotOptions?.addEventListener("click", event => {
+  const button=event.target.closest("button[data-help]");
+  if(!button)return;
+  const key=button.dataset.help;
+  const answers={
+    payment:"لو المبلغ اتخصم ومفيش طلب اتنفّذ، احتفظ بإشعار الدفع وما تكررش الدفع. ابعت تفاصيل المشكلة لفريق ZARO من نموذج الدعم، وما تبعتش بيانات البطاقة أو رمز OTP لأي حد.",
+    delay:"راجع حالة الطلب من صفحة طلباتي. لو الحالة ما اتغيرتش أو الطلب اتأخر عن الوقت الموضح، ابعت رقم الطلب من نموذج الدعم عشان الإدارة تراجعه.",
+    player:"لو لسه الطلب ما اتنفّذش، تواصل مع الإدارة فورًا واطلب مراجعة Player ID. بعد تنفيذ الشحن، التعديل ممكن مايبقاش متاح.",
+    package:"اختار اللعبة أولًا، وبعدها راجع عدد العملات/النقاط وبيانات الباقة قبل تأكيد الطلب. لو مش متأكد من الباقة، ابعت اسم اللعبة والباقة اللي محتار فيها للإدارة.",
+    human:"تمام، نموذج الدعم موجود تحت. اكتب اسمك وإيميلك ونوع المشكلة وتفاصيلها، وهتظهر رسالتك في لوحة إدارة ZARO."
+  };
+  const labels={order:"متابعة طلب",payment:"مشكلة في الدفع",delay:"الطلب اتأخر",player:"خطأ في Player ID",package:"اختيار باقة",human:"التواصل مع الإدارة"};
+  addHelpBotMessage(labels[key],"user");
+  if(key==="order"){
+    helpBotWaitingForOrder=true;
+    helpBotInputForm.hidden=false;
+    helpBotInput.placeholder="اكتب رقم الطلب...";
+    helpBotInput.value="";
+    helpBotInput.focus();
+    addHelpBotMessage("اكتب رقم الطلب. هجهز لك رسالة للإدارة، لأن عرض حالة الطلب مباشرة من المساعد لسه مش متاح.");
+  } else {
+    helpBotWaitingForOrder=false;
+    helpBotInputForm.hidden=true;
+    addHelpBotMessage(answers[key]||"اختار موضوع من الأزرار أو تواصل مع الإدارة.");
+    if(key==="human") $("supportForm").scrollIntoView({behavior:"smooth",block:"center"});
+  }
+});
+helpBotInputForm?.addEventListener("submit", event => {
+  event.preventDefault();
+  const orderNo=helpBotInput.value.trim();
+  if(!orderNo)return;
+  addHelpBotMessage(orderNo,"user");
+  addHelpBotMessage("جهزت لك نموذج التواصل. راجع البيانات واكتب اسمك وإيميلك، وبعدها ابعت الرسالة للإدارة.");
+  helpBotWaitingForOrder=false;
+  helpBotInputForm.hidden=true;
+  routeToSupport("مشكلة في طلب","أحتاج متابعة الطلب رقم: "+orderNo);
+});
+
 function makeToken(){const bytes=new Uint8Array(32);crypto.getRandomValues(bytes);return Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");}
 function showConversation(data){
  const t=data.ticket;
