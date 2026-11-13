@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080808">
+  <title>ZARO | حسابي</title>
+  <link rel="stylesheet" href="zaro.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Orbitron:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    .profile-wrap{width:min(1050px,92%);margin:55px auto 100px;position:relative;z-index:1}
+    .profile-heading{text-align:center;margin:35px 0 32px}.profile-heading .tag{color:#ff7b32;font:700 10px Orbitron,sans-serif;letter-spacing:3px}.profile-heading h1{font-size:clamp(30px,5vw,48px);margin:12px 0 5px}.profile-heading p{color:#999;font-size:13px}
+    .profile-shell{max-width:760px;margin:auto;padding:clamp(20px,4vw,38px);border:1px solid rgba(255,120,45,.24);border-radius:20px;background:linear-gradient(145deg,rgba(27,29,36,.97),rgba(10,11,15,.97));box-shadow:0 25px 80px #0008}
+    .profile-tabs{display:flex;gap:8px;padding:5px;border:1px solid #ffffff14;border-radius:12px;background:#08090d;margin-bottom:25px}
+    .profile-tabs button{flex:1;border:0;border-radius:9px;padding:11px;background:transparent;color:#aaa;font:700 13px Cairo;cursor:pointer}.profile-tabs button.active{background:#ff6a22;color:#111}
+    .profile-form{display:grid;gap:13px}.profile-form[hidden],.profile-panel[hidden]{display:none}
+    .profile-form label{font-size:12px;color:#c9c9c9;font-weight:700;margin-top:5px}
+    .profile-form input{width:100%;padding:13px 14px;border:1px solid #ffffff20;border-radius:10px;background:#101219;color:white;font:14px Cairo;outline:none}
+    .profile-form input:focus{border-color:#ff762f;box-shadow:0 0 0 3px #ff762f20}
+    .profile-primary,.profile-logout{border:0;border-radius:10px;padding:13px 18px;font:800 14px Cairo;cursor:pointer}
+    .profile-primary{background:#ff6a22;color:#111;margin-top:8px}.profile-primary:disabled{opacity:.55;cursor:wait}
+    .profile-feedback{min-height:25px;margin:12px 0 0;color:#ffb184;font-size:12px;line-height:1.8;text-align:center}
+    .profile-status{padding:18px;border-radius:13px;background:#ffffff08;border:1px solid #ffffff13;text-align:center;margin-bottom:20px}
+    .profile-status strong{display:block;font-size:21px;margin-bottom:4px}.profile-status p{font-size:12px;color:#aaa;line-height:1.9}
+    .profile-status.pending{border-color:#d99b3d55}.profile-status.active{border-color:#48bd8055}.profile-status.rejected,.profile-status.suspended{border-color:#e45b5b55}
+    .profile-data{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .profile-data article{padding:15px;border:1px solid #ffffff13;border-radius:12px;background:#ffffff06;min-width:0}
+    .profile-data span{display:block;color:#999;font-size:11px;margin-bottom:6px}.profile-data strong{display:block;font-size:14px;overflow-wrap:anywhere}
+    .profile-id{font:800 19px Orbitron,sans-serif!important;color:#ff8a45;direction:ltr;text-align:right}
+    .profile-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}.profile-actions a{padding:10px 15px;border:1px solid #ffffff20;border-radius:9px;font-size:12px;font-weight:700}.profile-actions a:hover{border-color:#ff762f;color:#ff9a60}
+    .profile-logout{background:#292b33;color:#eee}.profile-note{margin-top:18px;color:#858995;font-size:10px;line-height:1.8;text-align:center}
+    @media(max-width:560px){.profile-data{grid-template-columns:1fr}.profile-wrap{margin-top:28px}.profile-heading{margin:20px 0}}
+  </style>
+</head>
+<body>
+  <div class="background-effects"><div class="light-orb orb-one"></div><div class="light-orb orb-two"></div><div class="grid-overlay"></div></div>
+  <header class="navbar">
+    <a href="zaro.html" class="brand"><img src="zaro-logo.png.png" alt="ZARO"><span>ZARO<span class="brand-dot">.</span></span></a>
+    <nav class="nav-links">
+      <a href="zaro.html">الرئيسية</a><a href="ZGames.html">الألعاب</a><a href="ZOrders.html">طلباتي</a><a href="ZSupport.html">الدعم</a><a href="ZProfile.html" class="active">حسابي</a>
+    </nav>
+    <a href="ZGames.html" class="nav-button">دخول المتجر <span>↗</span></a>
+  </header>
+
+  <main class="profile-wrap">
+    <section class="profile-heading"><span class="tag">ZARO MEMBER AREA</span><h1>حسابك في <span style="color:#ff6a22">ZARO</span></h1><p>سجّل دخولك أو أنشئ حسابك واحتفظ بهويتك داخل المتجر.</p></section>
+    <section class="profile-shell">
+      <div id="authArea">
+        <div class="profile-tabs"><button type="button" id="showLogin" class="active">تسجيل الدخول</button><button type="button" id="showRegister">إنشاء حساب</button></div>
+        <form id="loginForm" class="profile-form">
+          <label for="loginEmail">البريد الإلكتروني</label><input id="loginEmail" type="email" autocomplete="email" placeholder="name@example.com" required>
+          <label for="loginPassword">كلمة المرور</label><input id="loginPassword" type="password" autocomplete="current-password" minlength="6" placeholder="كلمة المرور" required>
+          <button class="profile-primary" type="submit">دخول إلى حسابي</button>
+        </form>
+        <form id="registerForm" class="profile-form" hidden>
+          <label for="registerName">الاسم بالكامل</label><input id="registerName" type="text" autocomplete="name" maxlength="70" placeholder="اكتب اسمك" required>
+          <label for="registerEmail">البريد الإلكتروني</label><input id="registerEmail" type="email" autocomplete="email" placeholder="name@example.com" required>
+          <label for="registerPassword">كلمة المرور</label><input id="registerPassword" type="password" autocomplete="new-password" minlength="8" placeholder="8 أحرف على الأقل" required>
+          <label for="registerConfirm">تأكيد كلمة المرور</label><input id="registerConfirm" type="password" autocomplete="new-password" minlength="8" placeholder="اكتب كلمة المرور مرة أخرى" required>
+          <button class="profile-primary" type="submit">إنشاء حساب ZARO</button>
+        </form>
+        <p id="authFeedback" class="profile-feedback" role="status" aria-live="polite"></p>
+      </div>
+
+      <section id="profilePanel" class="profile-panel" hidden>
+        <div id="statusCard" class="profile-status"><strong id="statusTitle">حالة الحساب</strong><p id="statusDescription"></p></div>
+        <div class="profile-data">
+          <article><span>الاسم</span><strong id="profileName">-</strong></article>
+          <article><span>البريد الإلكتروني</span><strong id="profileEmail">-</strong></article>
+          <article><span>ZARO ID</span><strong id="profileZaroId" class="profile-id">بانتظار التفعيل</strong></article>
+          <article><span>تاريخ إنشاء الحساب</span><strong id="profileCreated">-</strong></article>
+        </div>
+        <div class="profile-actions"><a href="ZOrders.html">عرض طلباتي</a><a href="ZGames.html">تصفح الألعاب</a><a href="ZSupport.html">مركز الدعم</a><button type="button" id="logoutButton" class="profile-logout">تسجيل الخروج</button></div>
+        <p id="profileFeedback" class="profile-feedback" role="status" aria-live="polite"></p>
+      </section>
+      <p class="profile-note">الحسابات الجديدة بتظهر للإدارة للمراجعة. رقم ZARO ID بيتخصص بعد موافقة الإدارة فقط. لا تشارك كلمة المرور أو رمز التحقق مع أي شخص.</p>
+    </section>
+  </main>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+    const supabase = createClient("https://rtqdcbkttrxbmglzllmv.supabase.co", "sb_publishable_iqwtKiJMmx9QEO4l1Zo7iQ_kHvZZH0c");
+    const $ = id => document.getElementById(id);
+    const authArea = $("authArea"), profilePanel = $("profilePanel"), authFeedback = $("authFeedback");
+    const loginForm = $("loginForm"), registerForm = $("registerForm");
+    let busy = false;
+
+    function setBusy(form, value) {
+      busy = value;
+      const button = form.querySelector("button[type=submit]");
+      button.disabled = value;
+      button.textContent = value ? "جاري التنفيذ..." : (form === loginForm ? "دخول إلى حسابي" : "إنشاء حساب ZARO");
+    }
+    function showTab(tab) {
+      const login = tab === "login";
+      loginForm.hidden = !login; registerForm.hidden = login;
+      $("showLogin").classList.toggle("active", login);
+      $("showRegister").classList.toggle("active", !login);
+      authFeedback.textContent = "";
+    }
+    $("showLogin").addEventListener("click", () => showTab("login"));
+    $("showRegister").addEventListener("click", () => showTab("register"));
+
+    function statusInfo(status) {
+      const map = {
+        pending: ["الحساب قيد المراجعة", "استلمنا تسجيلك. حسابك هيفتح بالكامل بعد مراجعة وموافقة إدارة ZARO."],
+        active: ["حسابك نشط", "تمت الموافقة على حسابك. تقدر تستخدم خدمات حساب ZARO."],
+        rejected: ["لم تتم الموافقة على الحساب", "لو شايف إن ده حصل بالخطأ، تواصل مع فريق الدعم."],
+        suspended: ["الحساب موقوف مؤقتًا", "الوصول للحساب متوقف حاليًا. تواصل مع فريق الدعم للمراجعة."]
+      };
+      return map[status] || ["حالة غير معروفة", "تواصل مع دعم ZARO للمساعدة."];
+    }
+    async function renderProfile(user) {
+      authArea.hidden = true; profilePanel.hidden = false;
+      $("profileName").textContent = user.user_metadata?.full_name || user.email || "عضو ZARO";
+      $("profileEmail").textContent = user.email || "-";
+      $("profileCreated").textContent = user.created_at ? new Date(user.created_at).toLocaleDateString("ar-EG") : "-";
+      $("profileZaroId").textContent = "جارٍ التحميل...";
+      $("statusTitle").textContent = "جارٍ تحميل حالة الحساب...";
+      $("statusDescription").textContent = "";
+      $("statusCard").className = "profile-status";
+      const { data, error } = await supabase.from("customer_profiles")
+        .select("zaro_id,full_name,email,status,created_at")
+        .eq("user_id", user.id).maybeSingle();
+      if (error) {
+        $("statusTitle").textContent = "تعذر تحميل بيانات الحساب";
+        $("statusDescription").textContent = "حدّث الصفحة أو تواصل مع دعم ZARO. (" + error.message + ")";
+        $("profileFeedback").textContent = "";
+        return;
+      }
+      if (!data) {
+        $("statusTitle").textContent = "بيانات الحساب لم تكتمل";
+        $("statusDescription").textContent = "ملف الحساب غير موجود. تواصل مع الدعم لمراجعته.";
+        $("profileZaroId").textContent = "غير متاح";
+        return;
+      }
+      $("profileName").textContent = data.full_name || user.user_metadata?.full_name || "-";
+      $("profileEmail").textContent = data.email || user.email || "-";
+      $("profileCreated").textContent = data.created_at ? new Date(data.created_at).toLocaleDateString("ar-EG") : "-";
+      const [title, description] = statusInfo(data.status);
+      $("statusTitle").textContent = title;
+      $("statusDescription").textContent = description;
+      $("statusCard").className = "profile-status " + data.status;
+      $("profileZaroId").textContent = data.status === "active" && data.zaro_id ? data.zaro_id : "يظهر بعد الموافقة";
+      $("profileFeedback").textContent = "";
+    }
+
+    async function restoreSession() {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) { authFeedback.textContent = "تعذر التحقق من الجلسة. حدّث الصفحة."; return; }
+      if (data.session?.user) await renderProfile(data.session.user);
+    }
+    loginForm.addEventListener("submit", async event => {
+      event.preventDefault(); if (busy) return;
+      authFeedback.textContent = "";
+      setBusy(loginForm, true);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: $("loginEmail").value.trim(),
+        password: $("loginPassword").value
+      });
+      setBusy(loginForm, false);
+      if (error) { authFeedback.textContent = error.message.includes("Invalid login credentials") ? "البريد الإلكتروني أو كلمة المرور غير صحيحة." : "تعذر تسجيل الدخول: " + error.message; return; }
+      await renderProfile(data.user);
+    });
+    registerForm.addEventListener("submit", async event => {
+      event.preventDefault(); if (busy) return;
+      const name = $("registerName").value.trim(), email = $("registerEmail").value.trim();
+      const password = $("registerPassword").value, confirm = $("registerConfirm").value;
+      if (name.length < 2) { authFeedback.textContent = "اكتب الاسم بشكل صحيح."; return; }
+      if (password.length < 8) { authFeedback.textContent = "كلمة المرور لازم تكون 8 أحرف على الأقل."; return; }
+      if (password !== confirm) { authFeedback.textContent = "كلمتا المرور غير متطابقتين."; return; }
+      authFeedback.textContent = "";
+      setBusy(registerForm, true);
+      const { data, error } = await supabase.auth.signUp({
+        email, password, options: { data: { full_name: name } }
+      });
+      setBusy(registerForm, false);
+      if (error) { authFeedback.textContent = "تعذر إنشاء الحساب: " + error.message; return; }
+      if (data.session?.user) {
+        authFeedback.textContent = "تم إنشاء الحساب. جاري تحميل ملفك...";
+        await renderProfile(data.session.user);
+      } else {
+        registerForm.reset();
+        showTab("login");
+        authFeedback.textContent = "تم إنشاء الحساب. راجع بريدك الإلكتروني واضغط رابط التأكيد، وبعدها سجّل الدخول.";
+      }
+    });
+    $("logoutButton").addEventListener("click", async () => {
+      $("profileFeedback").textContent = "جاري تسجيل الخروج...";
+      const { error } = await supabase.auth.signOut();
+      if (error) { $("profileFeedback").textContent = "تعذر تسجيل الخروج: " + error.message; return; }
+      profilePanel.hidden = true; authArea.hidden = false; loginForm.reset(); registerForm.reset(); showTab("login");
+      authFeedback.textContent = "تم تسجيل الخروج.";
+    });
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") { profilePanel.hidden = true; authArea.hidden = false; }
+    });
+    await restoreSession();
+  </script>
+</body>
+</html>
