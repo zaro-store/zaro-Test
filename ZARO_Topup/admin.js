@@ -61,7 +61,7 @@ function renderCatalog(){
 function renderPackages(){
  const q=($("packageSearch").value||"").trim().toLowerCase(),gid=$("packageGameFilter").value;
  const filtered=packages.filter(p=>{const g=games.find(x=>x.id===p.game_id);return (!gid||p.game_id===gid)&&[p.package_name,p.amount_label,g?.name_en,g?.name_ar].some(v=>String(v||"").toLowerCase().includes(q));});
- $("packagesTable").innerHTML=filtered.length?filtered.map(p=>{const g=games.find(x=>x.id===p.game_id)||{};return '<tr data-package-row="'+p.id+'"><td>'+escapeHTML(g.name_en||g.name_ar||"—")+'</td><td><strong>'+escapeHTML(p.package_name)+'</strong><small class="cell-sub">'+escapeHTML(p.amount_label)+'</small></td><td><input class="package-field sku-field" aria-label="SKU المورد" value="'+escapeHTML(p.supplier_sku||"")+'" placeholder="Supplier SKU"></td><td><input class="package-field cost-field" aria-label="تكلفة المورد" type="number" min="0" step=".01" value="'+(p.supplier_cost??"")+'" placeholder="0.00"></td><td><input class="package-field price-field" aria-label="سعر البيع" type="number" min="0" step=".01" value="'+(p.selling_price??"")+'" placeholder="0.00"></td><td><span class="order-status '+(p.is_active?"completed":"pending")+'">'+(p.is_active?"مفعّلة":"غير مفعّلة")+'</span></td><td><button class="mini-button save-package" data-id="'+p.id+'">حفظ</button></td></tr>';}).join(""):'<tr><td colspan="7">لا توجد باقات مطابقة.</td></tr>';
+ $("packagesTable").innerHTML=filtered.length?filtered.map(p=>{const g=games.find(x=>x.id===p.game_id)||{};return '<tr data-package-row="'+p.id+'"><td>'+escapeHTML(g.name_en||g.name_ar||"—")+'</td><td><strong>'+escapeHTML(p.package_name)+'</strong><small class="cell-sub">'+escapeHTML(p.amount_label)+'</small></td><td><input class="package-field sku-field" aria-label="SKU المورد" value="'+escapeHTML(p.supplier_sku||"")+'" placeholder="Supplier SKU"></td><td><input class="package-field cost-field" aria-label="تكلفة المورد" type="number" min="0" step=".01" value="'+(p.supplier_cost??"")+'" placeholder="0.00"></td><td><input class="package-field price-field" aria-label="سعر البيع" type="number" min="0" step=".01" value="'+(p.selling_price??"")+'" placeholder="0.00"></td><td><select class="row-action-select package-active"><option value="false" '+(!p.is_active?"selected":"")+' >غير مفعّلة</option><option value="true" '+(p.is_active?"selected":"")+' >مفعّلة</option></select></td><td><button class="mini-button save-package" data-id="'+p.id+'">حفظ</button></td></tr>';}).join(""):'<tr><td colspan="7">لا توجد باقات مطابقة.</td></tr>';
 }
 
 async function loadCustomers(){
@@ -132,11 +132,11 @@ $("gamesGrid").addEventListener("click",async e=>{
 $("packagesTable").addEventListener("click",async e=>{
  const b=e.target.closest(".save-package");if(!b)return;const row=b.closest("tr"),id=b.dataset.id,p=packages.find(x=>x.id===id);if(!p)return;
  const sku=row.querySelector(".sku-field").value.trim(),cost=row.querySelector(".cost-field").value,price=row.querySelector(".price-field").value;
- const supplierCost=cost===""?null:Number(cost),sellingPrice=price===""?null:Number(price);
+ const supplierCost=cost===""?null:Number(cost),sellingPrice=price===""?null:Number(price),isActive=row.querySelector(".package-active").value==="true";
  if((supplierCost!==null&&(!Number.isFinite(supplierCost)||supplierCost<0))||(sellingPrice!==null&&(!Number.isFinite(sellingPrice)||sellingPrice<0))){notify("راجع الأرقام المدخلة.");return;}
- if(p.is_active&&(!sku||supplierCost===null||sellingPrice===null)){notify("لا يمكن حفظ باقة مفعّلة بدون SKU وتكلفة وسعر بيع.");return;}
- if(!p.is_active&&sku&&supplierCost!==null&&sellingPrice!==null&&!confirm("حفظ بيانات المورد والأسعار؟ ستظل الباقة غير مفعّلة.")){return;}
- b.disabled=true;const {error}=await supabase.from("catalog_packages").update({supplier_sku:sku||null,supplier_cost:supplierCost,selling_price:sellingPrice,updated_at:new Date().toISOString()}).eq("id",id);b.disabled=false;
+ if(isActive&&(!sku||supplierCost===null||sellingPrice===null||sellingPrice<=0)){notify("لا يمكن تفعيل باقة بدون SKU وتكلفة وسعر بيع صحيحين من المورد.");return;}
+ if(isActive&&!p.is_active&&!confirm("تفعيل هذه الباقة في الكتالوج العام؟ تأكد أن المورد أكد السعر وSKU وأن الشحن جاهز.")){return;}
+ b.disabled=true;const {error}=await supabase.from("catalog_packages").update({supplier_sku:sku||null,supplier_cost:supplierCost,selling_price:sellingPrice,is_active:isActive,updated_at:new Date().toISOString()}).eq("id",id);b.disabled=false;
  if(error)notify("فشل حفظ الباقة: "+error.message);else notify("تم حفظ بيانات الباقة، ولم يتم تفعيلها.");await loadCatalog();
 });
 $("customersTable").addEventListener("change",async e=>{
