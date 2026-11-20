@@ -13,10 +13,10 @@
   "theme_color": "#080808",
   "icons": [
     {
-      "src": "./zaro-app-icon.svg",
+      "src": "./zaro-app-icon.svg?v=2",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
