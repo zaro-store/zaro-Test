@@ -32,6 +32,7 @@
       <button class="nav-item" data-page="customers"><i class="fa-solid fa-users"></i><span>العملاء</span></button>
       <button class="nav-item" data-page="support"><i class="fa-solid fa-headset"></i><span>الدعم الفني</span><b class="nav-count" id="openTicketsCount">0</b></button>
       <span class="nav-label">النظام</span>
+      <button class="nav-item" data-page="operations"><i class="fa-solid fa-sliders"></i><span>التشغيل والتسعير</span></button>
       <button class="nav-item" data-page="settings"><i class="fa-solid fa-gear"></i><span>الإعدادات</span></button>
     </nav>
     <button class="logout-button" id="logoutButton"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</button>
@@ -78,8 +79,34 @@
       <div class="content-card ticket-detail"><div class="section-heading"><div><span>TICKET DETAILS</span><h2 id="ticketTitle">اختر تذكرة</h2></div><select id="ticketStatus" disabled><option value="open">مفتوحة</option><option value="answered">تم الرد</option><option value="closed">مغلقة</option></select></div><div id="ticketMeta" class="ticket-meta">تفاصيل العميل ستظهر هنا.</div><div id="messagesList" class="messages-list"><p class="empty-message">لا توجد تذكرة محددة.</p></div><form id="replyForm" class="reply-form"><textarea id="replyBody" rows="3" placeholder="اكتب ردك للعميل..." required disabled></textarea><button type="submit" id="sendReplyButton" disabled><i class="fa-solid fa-paper-plane"></i> إرسال الرد</button></form></div></div>
     </section>
 
+    <section class="dashboard-page" id="page-operations">
+      <div class="welcome-banner"><div><span>INTERNAL OPERATIONS</span><h2>مركز التشغيل والتسعير</h2><p>هذه الصفحة جزء من لوحة الإدارة وتظهر بعد تسجيل دخول المدير.</p></div><div class="welcome-icon"><i class="fa-solid fa-sliders"></i></div></div>
+      <div class="stats-grid">
+        <article class="stat-card"><div class="stat-icon orange"><i class="fa-solid fa-gamepad"></i></div><span>الألعاب المسجلة</span><strong id="opsGamesCount">6</strong><small>غير مفعّلة حتى تأكيد المورد</small></article>
+        <article class="stat-card"><div class="stat-icon blue"><i class="fa-solid fa-boxes-stacked"></i></div><span>الباقات المسجلة</span><strong id="opsPackagesCount">36</strong><small>أسعارها غير مؤكدة</small></article>
+        <article class="stat-card"><div class="stat-icon yellow"><i class="fa-solid fa-user-check"></i></div><span>حد المراجعة الشخصية</span><strong>500 ج.م</strong><small>سياسة مقترحة وليست مفعّلة</small></article>
+        <article class="stat-card"><div class="stat-icon green"><i class="fa-solid fa-link-slash"></i></div><span>الدفع والمورد</span><strong>غير مربوط</strong><small>لا يوجد تنفيذ تلقائي</small></article>
+      </div>
+      <div class="content-card"><div class="section-heading"><div><span>PRICE CALCULATOR</span><h2>حاسبة التسعير</h2></div></div>
+        <p class="small-note">أدخل تكلفة المورد وهامش الربح. الحساب محلي ولا يحفظ أو ينشر الأسعار.</p>
+        <div class="toolbar"><label>تكلفة المورد (ج.م)<br><input id="opsCost" class="package-field" type="number" min="0" step=".01" placeholder="100"></label><label>هامش الربح (%)<br><input id="opsMargin" class="package-field" type="number" min="0" step=".1" value="10"></label><div class="stat-card"><span>سعر البيع المقترح</span><strong id="opsPrice">—</strong><small id="opsProfit">أدخل تكلفة المورد</small></div></div>
+      </div>
+      <div class="content-card"><div class="section-heading"><div><span>PRE-LAUNCH CHECKLIST</span><h2>شروط ما قبل الإطلاق</h2></div></div>
+        <div class="health-row"><span>قائمة أسعار رسمية من المورد</span><strong class="order-status pending">مطلوب</strong></div>
+        <div class="health-row"><span>تأكيد SKU وتكلفة كل باقة</span><strong class="order-status pending">مطلوب</strong></div>
+        <div class="health-row"><span>بوابة دفع وتحقق موثوق من الدفع</span><strong class="order-status pending">غير مربوط</strong></div>
+        <div class="health-row"><span>API المورد واختبار منع التكرار</span><strong class="order-status pending">غير مربوط</strong></div>
+        <div class="health-row"><span>اختبار الفشل والاسترجاع</span><strong class="order-status pending">لم يبدأ</strong></div>
+        <div class="health-warning"><i class="fa-solid fa-triangle-exclamation"></i><span>لا تفعّل الباقات ولا تعتبر الطلب مكتملًا قبل تأكيد الدفع ونجاح الشحن من المورد.</span></div>
+      </div>
+      <div class="content-card"><div class="section-heading"><div><span>ORDER POLICY</span><h2>سياسة الموافقة المقترحة</h2></div></div>
+        <ol class="steps-list"><li>الطلب يظل في انتظار الدفع حتى يصل تأكيد موثوق من بوابة الدفع.</li><li>بعد تأكيد الدفع وربط المورد: الطلبات الأقل من 500 ج.م تدخل مسار الموافقة الآلية.</li><li>الطلبات بقيمة 500 ج.م أو أكثر تنتظر موافقة الإدارة الشخصية.</li><li>لا تتحول الحالة إلى مكتمل إلا بعد تأكيد المورد نجاح الشحن.</li></ol>
+        <p class="small-note">هذه السياسة للعرض والتخطيط فقط، ولم يتم تفعيلها برمجيًا.</p>
+      </div>
+    </section>
+
     <section class="dashboard-page" id="page-settings">
-      <div class="content-card"><div class="section-heading"><div><span>SYSTEM SETTINGS</span><h2>إعدادات النظام</h2></div></div><div class="settings-grid"><div class="setting-tile"><i class="fa-solid fa-shield-halved"></i><div><strong>حماية لوحة الإدارة</strong><p>الدخول مقيد بحساب المدير المحدد، وقاعدة البيانات تستخدم RLS.</p></div><b class="setting-state">مفعّلة</b></div><div class="setting-tile"><i class="fa-solid fa-database"></i><div><strong>قاعدة البيانات</strong><p>Supabase متصل عبر المفتاح العام وجلسة المدير.</p></div><b class="setting-state">متصل</b></div><div class="setting-tile"><i class="fa-solid fa-credit-card"></i><div><strong>بوابة الدفع</strong><p>لم يتم ربط بوابة دفع أو تحقق آلي من المدفوعات.</p></div><b class="setting-state pending-state">غير مفعّلة</b></div><div class="setting-tile"><i class="fa-solid fa-truck-fast"></i><div><strong>مورد الشحن</strong><p>لم يتم ربط API مورد معتمد حتى الآن.</p></div><b class="setting-state pending-state">غير مربوط</b></div></div><div class="settings-footer"><div><strong>جلسة المدير الحالية</strong><p id="sessionEmail">—</p></div><a class="view-all-button" href="ZARO-Operations.html">فتح مركز التشغيل والتسعير ↗</a></div></div>
+      <div class="content-card"><div class="section-heading"><div><span>SYSTEM SETTINGS</span><h2>إعدادات النظام</h2></div></div><div class="settings-grid"><div class="setting-tile"><i class="fa-solid fa-shield-halved"></i><div><strong>حماية لوحة الإدارة</strong><p>الدخول مقيد بحساب المدير المحدد، وقاعدة البيانات تستخدم RLS.</p></div><b class="setting-state">مفعّلة</b></div><div class="setting-tile"><i class="fa-solid fa-database"></i><div><strong>قاعدة البيانات</strong><p>Supabase متصل عبر المفتاح العام وجلسة المدير.</p></div><b class="setting-state">متصل</b></div><div class="setting-tile"><i class="fa-solid fa-credit-card"></i><div><strong>بوابة الدفع</strong><p>لم يتم ربط بوابة دفع أو تحقق آلي من المدفوعات.</p></div><b class="setting-state pending-state">غير مفعّلة</b></div><div class="setting-tile"><i class="fa-solid fa-truck-fast"></i><div><strong>مورد الشحن</strong><p>لم يتم ربط API مورد معتمد حتى الآن.</p></div><b class="setting-state pending-state">غير مربوط</b></div></div><div class="settings-footer"><div><strong>جلسة المدير الحالية</strong><p id="sessionEmail">—</p></div></div></div>
     </section>
   </main>
 </div>
