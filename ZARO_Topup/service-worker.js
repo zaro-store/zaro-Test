@@ -1,10 +1,10 @@
-const CACHE_NAME = "zaro-admin-pwa-v1";
+const CACHE_NAME = "zaro-admin-pwa-v2";
 const APP_SHELL = [
   "./admin.html",
   "./admin.css?v=20261120-3",
   "./admin.js?v=20261120-3",
   "./manifest.webmanifest",
-  "./zaro-app-icon.svg"
+  "./zaro-app-icon.svg?v=2"
 ];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
