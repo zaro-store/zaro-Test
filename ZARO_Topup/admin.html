@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#080808"><title>ZARO | Admin Control Center</title>
+<meta name="theme-color" content="#080808"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="zaro-app-icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="zaro-app-icon.svg"><title>ZARO | Admin Control Center</title>
 <link rel="stylesheet" href="admin.css?v=20261120-3">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -41,7 +41,7 @@
   <main class="dashboard-main">
     <header class="topbar">
       <div class="topbar-title-wrap"><button id="mobileMenuButton" class="mobile-menu-button" aria-label="فتح القائمة"><i class="fa-solid fa-bars"></i></button><div><span class="topbar-label">ZARO MANAGEMENT</span><h1 id="pageTitle">نظرة عامة</h1></div></div>
-      <div class="topbar-actions"><button class="refresh-button" id="refreshButton"><i class="fa-solid fa-rotate"></i><span>تحديث البيانات</span></button><div class="system-status"><span></span> متصل بقاعدة البيانات</div><div class="topbar-avatar"><i class="fa-solid fa-user"></i></div></div>
+      <div class="topbar-actions"><button class="refresh-button" id="installAppButton" type="button" hidden><i class="fa-solid fa-download"></i><span>تثبيت التطبيق</span></button><button class="refresh-button" id="refreshButton"><i class="fa-solid fa-rotate"></i><span>تحديث البيانات</span></button><div class="system-status"><span></span> متصل بقاعدة البيانات</div><div class="topbar-avatar"><i class="fa-solid fa-user"></i></div></div>
     </header>
 
     <section class="dashboard-page active" id="page-overview">
@@ -111,4 +111,24 @@
   </main>
 </div>
 <script type="module" src="admin.js?v=20261120-3"></script>
+<script>
+let zaroInstallPrompt=null;
+const zaroInstallButton=document.getElementById("installAppButton");
+window.addEventListener("beforeinstallprompt",event=>{
+ event.preventDefault(); zaroInstallPrompt=event;
+ if(zaroInstallButton) zaroInstallButton.hidden=false;
+});
+zaroInstallButton?.addEventListener("click",async()=>{
+ if(!zaroInstallPrompt)return;
+ zaroInstallPrompt.prompt();
+ await zaroInstallPrompt.userChoice;
+ zaroInstallPrompt=null; zaroInstallButton.hidden=true;
+});
+window.addEventListener("appinstalled",()=>{
+ if(zaroInstallButton) zaroInstallButton.hidden=true;
+});
+if("serviceWorker" in navigator){
+ window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(err=>console.error("ZARO app setup:",err)));
+}
+</script>
 </body></html>
