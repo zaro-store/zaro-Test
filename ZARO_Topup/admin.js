@@ -8,7 +8,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = (id) => document.getElementById(id);
 const loginSection = $("loginSection"), dashboardSection = $("dashboardSection");
 const loginForm = $("loginForm"), loginButton = $("loginButton"), loginMessage = $("loginMessage");
-const pageNames = {overview:"نظرة عامة",orders:"إدارة الطلبات",products:"الألعاب والباقات",customers:"العملاء",support:"الدعم الفني",settings:"إعدادات النظام"};
+const pageNames = {overview:"نظرة عامة",orders:"إدارة الطلبات",products:"الألعاب والباقات",customers:"العملاء",support:"الدعم الفني",settings:"إعدادات النظام",operations:"مركز التشغيل والتسعير"};
 let orders=[], games=[], packages=[], customers=[], tickets=[], selectedTicket=null, currentUser=null;
 
 function escapeHTML(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
@@ -161,3 +161,15 @@ $("logoutButton").addEventListener("click",async()=>{const {error}=await supabas
 supabase.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_OUT"||!session){currentUser=null;showLogin();}});
 async function checkSession(){const {data,error}=await supabase.auth.getSession();if(error||!data.session){showLogin();return;}if(data.session.user.id!==ADMIN_UID){await supabase.auth.signOut();showLogin();return;}currentUser=data.session.user;showDashboard();$("adminEmail").textContent=currentUser.email||"مدير المتجر";$("sessionEmail").textContent=currentUser.email||"—";await loadAll();}
 checkSession();
+
+const opsCost=$("opsCost"),opsMargin=$("opsMargin");
+function calculateOpsPrice(){
+ if(!opsCost||!opsMargin)return;
+ const c=Number(opsCost.value),m=Number(opsMargin.value);
+ if(!opsCost.value||c<=0||!Number.isFinite(m)||m<0){$("opsPrice").textContent="—";$("opsProfit").textContent="أدخل تكلفة صحيحة";return;}
+ const selling=c*(1+m/100);
+ $("opsPrice").textContent=selling.toLocaleString("ar-EG",{maximumFractionDigits:2})+" ج.م";
+ $("opsProfit").textContent="ربح تقديري: "+(selling-c).toLocaleString("ar-EG",{maximumFractionDigits:2})+" ج.م";
+}
+opsCost?.addEventListener("input",calculateOpsPrice);
+opsMargin?.addEventListener("input",calculateOpsPrice);
