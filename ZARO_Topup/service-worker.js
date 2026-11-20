@@ -1,10 +1,10 @@
-const CACHE_NAME = "zaro-admin-pwa-v2";
+const CACHE_NAME = "zaro-admin-pwa-v3";
 const APP_SHELL = [
   "./admin.html",
   "./admin.css?v=20261120-3",
   "./admin.js?v=20261120-3",
   "./manifest.webmanifest",
-  "./zaro-app-icon.svg?v=2"
+  "./zaro-app-icon.svg?v=3"
 ];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
@@ -26,9 +26,7 @@ self.addEventListener("fetch", event => {
     } catch (error) {
       const cached = await cache.match(request);
       if (cached) return cached;
-      if (request.mode === "navigate") {
-        return (await cache.match("./admin.html")) || Response.error();
-      }
+      if (request.mode === "navigate") return (await cache.match("./admin.html")) || Response.error();
       return Response.error();
     }
   })());
