@@ -1,0 +1,22 @@
+{
+  "id": "./admin.html",
+  "name": "ZARO Admin Control Center",
+  "short_name": "ZARO Admin",
+  "description": "ZARO Store administration dashboard",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./admin.html?source=installed-app",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#080808",
+  "theme_color": "#080808",
+  "icons": [
+    {
+      "src": "./zaro-app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
