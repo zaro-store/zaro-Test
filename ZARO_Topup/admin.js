@@ -111,7 +111,14 @@ loginForm.addEventListener("submit",async e=>{
  }catch(err){loginMessage.style.color="#ff6262";loginMessage.textContent=err.message;}finally{loginButton.disabled=false;loginButton.textContent="تسجيل الدخول";}
 });
 
-document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
+document.addEventListener("click",e=>{
+ const button=e.target.closest("[data-page]");
+ if(!button)return;
+ const page=button.dataset.page;
+ if(!page||!$("page-"+page))return;
+ e.preventDefault();
+ showPage(page);
+});
 $("mobileMenuButton").addEventListener("click",()=>$("sidebar").classList.toggle("mobile-open"));
 $("refreshButton").addEventListener("click",loadAll);
 $("orderSearch").addEventListener("input",renderOrders);$("orderStatusFilter").addEventListener("change",renderOrders);
