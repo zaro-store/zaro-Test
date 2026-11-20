@@ -1,7 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<rect width="512" height="512" rx="112" fill="#080808"/>
-<rect x="18" y="18" width="476" height="476" rx="98" fill="none" stroke="#ff5b16" stroke-width="12"/>
-<path d="M112 142h288v54H218L390 370H112v-54h172L112 142z" fill="#fff"/>
-<circle cx="395" cy="370" r="28" fill="#ff5b16"/>
-<path d="M112 400h288" stroke="#ff5b16" stroke-width="16" stroke-linecap="round"/>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#17100d"/><stop offset="1" stop-color="#050505"/></linearGradient>
+  <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9a45"/><stop offset=".55" stop-color="#ff5b16"/><stop offset="1" stop-color="#c92e08"/></linearGradient>
+  <filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="12" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="512" height="512" rx="116" fill="url(#bg)"/>
+<rect x="17" y="17" width="478" height="478" rx="105" fill="none" stroke="url(#edge)" stroke-width="15"/>
+<path d="M126 145h260v56L222 311h164v56H126v-56l164-110H126z" fill="#fff"/>
+<path d="M126 395h260" stroke="#ff641f" stroke-width="14" stroke-linecap="round" filter="url(#glow)"/>
+<circle cx="390" cy="367" r="25" fill="#ff641f"/>
+<path d="M383 367l6 6 11-14" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
