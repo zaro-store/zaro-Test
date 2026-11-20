@@ -764,3 +764,14 @@ button,input,select,textarea{font-family:inherit}
  .section-heading{align-items:flex-start}
  .package-field{width:95px}
 }
+
+.sidebar{width:230px}
+.dashboard-main{width:calc(100% - 230px);margin-right:230px;padding:30px}
+.welcome-banner{min-height:190px;padding:28px 30px}
+.stats-grid{gap:14px;margin:20px 0}
+.stat-card{min-height:182px}
+.overview-grid{grid-template-columns:minmax(320px,.78fr) minmax(0,1.42fr);gap:15px;direction:rtl;align-items:start}
+.overview-grid>.content-card{min-width:0}
+.sidebar-nav .nav-item{cursor:pointer;position:relative;z-index:2;pointer-events:auto}
+.dashboard-main .view-all-button{cursor:pointer}
+@media(max-width:900px){.dashboard-main{width:100%;margin-right:0;padding:18px 12px}.overview-grid{grid-template-columns:1fr}}
