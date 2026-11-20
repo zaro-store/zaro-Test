@@ -5,18 +5,15 @@
   "description": "ZARO Store administration dashboard",
   "lang": "ar",
   "dir": "rtl",
-  "start_url": "./admin.html?source=installed-app",
+  "start_url": "./admin.html?source=installed-app&v=3",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "any",
   "background_color": "#080808",
   "theme_color": "#080808",
   "icons": [
-    {
-      "src": "./zaro-app-icon.svg?v=2",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    }
+    {"src": "./zaro-app-icon.svg?v=3", "sizes": "192x192", "type": "image/svg+xml", "purpose": "any"},
+    {"src": "./zaro-app-icon.svg?v=3", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any"}
   ]
 }
