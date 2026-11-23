@@ -70,6 +70,8 @@
           <article><span>الاسم</span><strong id="profileName">-</strong></article>
           <article><span>البريد الإلكتروني</span><strong id="profileEmail">-</strong></article>
           <article><span>ZARO ID</span><strong id="profileZaroId" class="profile-id">بانتظار التفعيل</strong></article>
+          <article><span>Rank</span><strong id="profileRank">—</strong></article>
+          <article><span>Points</span><strong id="profilePoints">0</strong></article>
           <article><span>تاريخ إنشاء الحساب</span><strong id="profileCreated">-</strong></article>
         </div>
         <div class="profile-actions"><a href="ZOrders.html">عرض طلباتي</a><a href="ZGames.html">تصفح الألعاب</a><a href="ZSupport.html">مركز الدعم</a><button type="button" id="logoutButton" class="profile-logout">تسجيل الخروج</button></div>
@@ -112,8 +114,14 @@
       };
       return map[status] || ["حالة غير معروفة", "تواصل مع دعم ZARO للمساعدة."];
     }
+    const rankInfo = {
+      rookie: ["🛡️", "Rookie"], silver: ["🥈", "Silver"],
+      gold: ["🥇", "Gold"], diamond: ["💎", "Diamond"],
+      master: ["👑", "Master"], legend: ["🏆", "Legend"]
+    };
     async function renderProfile(user) {
       authArea.hidden = true; profilePanel.hidden = false;
+      await supabase.rpc("app_touch_activity");
       $("profileName").textContent = user.user_metadata?.full_name || user.email || "عضو ZARO";
       $("profileEmail").textContent = user.email || "-";
       $("profileCreated").textContent = user.created_at ? new Date(user.created_at).toLocaleDateString("ar-EG") : "-";
@@ -144,6 +152,11 @@
       $("statusDescription").textContent = description;
       $("statusCard").className = "profile-status " + data.status;
       $("profileZaroId").textContent = data.status === "active" && data.zaro_id ? data.zaro_id : "يظهر بعد الموافقة";
+      const { data: appProfile } = await supabase.from("app_profiles")
+        .select("rank_code,points").eq("user_id", user.id).maybeSingle();
+      const rank = rankInfo[appProfile?.rank_code] || rankInfo.rookie;
+      $("profileRank").textContent = rank[0] + " " + rank[1];
+      $("profilePoints").textContent = Number(appProfile?.points || 0).toLocaleString("en-US");
       $("profileFeedback").textContent = "";
     }
 
