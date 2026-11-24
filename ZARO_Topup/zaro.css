@@ -3383,3 +3383,100 @@ h1, h2, h3, p, span, a, strong, small {
   .hero h1 { font-size:30px; }
   .logo-container { width:min(84%,270px); }
 }
+
+
+/* ZARO SEARCH BAR REDESIGN */
+.games-catalog-tools {
+  width: min(760px, 100%);
+  margin: 28px auto 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+.games-catalog-tools::before {
+  content: "";
+  position: absolute;
+  right: 19px;
+  top: 50%;
+  width: 13px;
+  height: 13px;
+  border: 2px solid #929292;
+  border-radius: 50%;
+  transform: translateY(-62%);
+  pointer-events: none;
+  z-index: 2;
+  transition: .2s ease;
+}
+.games-catalog-tools::after {
+  content: "";
+  position: absolute;
+  right: 18px;
+  top: calc(50% + 7px);
+  width: 7px;
+  height: 2px;
+  border-radius: 2px;
+  background: #929292;
+  transform: rotate(45deg);
+  transform-origin: left center;
+  pointer-events: none;
+  z-index: 2;
+  transition: .2s ease;
+}
+.games-catalog-tools:focus-within::before { border-color: #ff8a36; }
+.games-catalog-tools:focus-within::after { background: #ff8a36; }
+.games-catalog-tools input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 54px;
+  padding: 14px 54px 14px 20px;
+  color: #f5f3ef;
+  background: linear-gradient(110deg, rgba(24,24,24,.98), rgba(15,15,15,.96));
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 14px;
+  outline: none;
+  font: 500 14px/1.5 'Cairo', sans-serif;
+  text-align: right;
+  direction: rtl;
+  box-shadow: 0 10px 28px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.025);
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.games-catalog-tools input::placeholder { color: #777; }
+.games-catalog-tools input:focus {
+  border-color: rgba(255,138,54,.8);
+  background: #151515;
+  box-shadow: 0 0 0 3px rgba(255,91,22,.11), 0 12px 32px rgba(0,0,0,.28);
+}
+.games-catalog-tools span {
+  flex: 0 0 auto;
+  min-width: 82px;
+  padding: 10px 13px;
+  color: #ff9a54;
+  background: rgba(255,91,22,.09);
+  border: 1px solid rgba(255,138,54,.2);
+  border-radius: 11px;
+  font: 700 11px/1.4 'Cairo', sans-serif;
+  text-align: center;
+  white-space: nowrap;
+}
+@media (max-width: 600px) {
+  .games-catalog-tools {
+    width: 100%;
+    margin-top: 18px;
+    gap: 8px;
+  }
+  .games-catalog-tools input {
+    min-height: 49px;
+    padding: 12px 48px 12px 13px;
+    font-size: 13px;
+    border-radius: 12px;
+  }
+  .games-catalog-tools::before { right: 16px; width: 12px; height: 12px; }
+  .games-catalog-tools::after { right: 15px; }
+  .games-catalog-tools span {
+    min-width: 70px;
+    padding: 9px 8px;
+    font-size: 10px;
+  }
+}
