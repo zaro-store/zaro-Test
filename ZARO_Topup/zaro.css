@@ -3480,3 +3480,89 @@ h1, h2, h3, p, span, a, strong, small {
     font-size: 10px;
   }
 }
+
+
+/* ZARO SEARCH CONSOLE - FULL REDESIGN */
+/* Replace the previous rounded search field with a minimal editorial search dock */
+.games-catalog-tools {
+  width: min(690px, 100%);
+  margin: 30px auto 4px;
+  padding: 18px 20px 13px;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  align-items: end;
+  gap: 14px;
+  position: relative;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgba(255,255,255,.2);
+  border-radius: 0;
+  box-shadow: none;
+}
+.games-catalog-tools::before {
+  content: "FIND A GAME";
+  position: absolute;
+  top: 0;
+  left: 20px;
+  color: #ff762b;
+  font: 700 9px/1 'Orbitron', sans-serif;
+  letter-spacing: 2.8px;
+  pointer-events: none;
+}
+.games-catalog-tools::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 64px;
+  height: 2px;
+  background: #ff7025;
+  box-shadow: 0 0 14px rgba(255,112,37,.45);
+  pointer-events: none;
+}
+.games-catalog-tools input {
+  grid-column: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 9px 2px 8px;
+  color: #fff;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  border-bottom: 0;
+  outline: none;
+  box-shadow: none;
+  font: 500 15px/1.5 'Cairo', sans-serif;
+  text-align: right;
+  direction: rtl;
+}
+.games-catalog-tools input::placeholder { color: #777; }
+.games-catalog-tools input:focus {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.games-catalog-tools span {
+  grid-column: 2;
+  align-self: end;
+  min-width: 0;
+  padding: 0 0 10px 2px;
+  color: #ff8a36;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  font: 700 10px/1.4 'Orbitron', sans-serif;
+  white-space: nowrap;
+}
+@media (max-width: 600px) {
+  .games-catalog-tools {
+    width: 100%;
+    margin: 25px auto 4px;
+    padding: 18px 12px 10px;
+    gap: 8px;
+  }
+  .games-catalog-tools::before { left: 12px; font-size: 8px; letter-spacing: 2px; }
+  .games-catalog-tools input { min-height: 40px; font-size: 13px; }
+  .games-catalog-tools span { font-size: 9px; }
+}
