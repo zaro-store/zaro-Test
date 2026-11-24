@@ -3566,3 +3566,89 @@ h1, h2, h3, p, span, a, strong, small {
   .games-catalog-tools input { min-height: 40px; font-size: 13px; }
   .games-catalog-tools span { font-size: 9px; }
 }
+
+
+/* ZARO SEARCH LAYOUT REPAIR - NO OVERLAP */
+/* Reset all earlier search-bar experiments and give every element its own space */
+.games-section { width: min(1250px, calc(100% - 40px)); margin: 0 auto; }
+.section-heading {
+  display: block !important;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto 30px !important;
+  text-align: center;
+}
+.games-catalog-tools,
+.section-heading .games-catalog-tools {
+  position: static !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  direction: ltr !important;
+  width: min(560px, 100%) !important;
+  max-width: 100% !important;
+  min-height: 0 !important;
+  box-sizing: border-box !important;
+  margin: 24px auto 0 !important;
+  padding: 0 !important;
+  gap: 12px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.games-catalog-tools::before,
+.games-catalog-tools::after { content: none !important; display: none !important; }
+.games-catalog-tools input {
+  display: block !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 48px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 17px !important;
+  color: #f5f3ef !important;
+  background: #151515 !important;
+  border: 1px solid #343434 !important;
+  border-radius: 9px !important;
+  outline: none !important;
+  box-shadow: none !important;
+  font: 500 14px/1.5 'Cairo', sans-serif !important;
+  text-align: right !important;
+  direction: rtl !important;
+}
+.games-catalog-tools input:focus {
+  border-color: #ff7025 !important;
+  box-shadow: 0 0 0 2px rgba(255,112,37,.12) !important;
+}
+.games-catalog-tools span {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 74px !important;
+  min-height: 38px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 10px !important;
+  color: #ff8a36 !important;
+  background: rgba(255,112,37,.09) !important;
+  border: 1px solid rgba(255,112,37,.24) !important;
+  border-radius: 7px !important;
+  font: 700 11px/1.4 'Cairo', sans-serif !important;
+  white-space: nowrap !important;
+}
+@media (max-width: 600px) {
+  .games-section { width: calc(100% - 26px); }
+  .section-heading { margin-bottom: 22px !important; }
+  .games-catalog-tools,
+  .section-heading .games-catalog-tools {
+    width: 100% !important;
+    margin-top: 18px !important;
+    gap: 8px !important;
+  }
+  .games-catalog-tools input { min-height: 45px !important; padding: 0 12px !important; font-size: 13px !important; }
+  .games-catalog-tools span { min-width: 66px !important; font-size: 10px !important; }
+}
