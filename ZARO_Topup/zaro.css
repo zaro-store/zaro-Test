@@ -3652,3 +3652,60 @@ h1, h2, h3, p, span, a, strong, small {
   .games-catalog-tools input { min-height: 45px !important; padding: 0 12px !important; font-size: 13px !important; }
   .games-catalog-tools span { min-width: 66px !important; font-size: 10px !important; }
 }
+
+
+/* ZARO FINAL SEARCH FIX 2026-11-24 */
+.games-section { width:min(1250px,calc(100% - 40px)) !important; margin:0 auto !important; }
+.section-heading { display:block !important; text-align:left !important; margin:0 0 28px !important; }
+.section-heading > span, .section-heading > h2, .section-heading > p { display:block !important; width:auto !important; }
+.section-heading .games-catalog-tools {
+  all: unset !important;
+  box-sizing:border-box !important;
+  display:flex !important;
+  width:min(560px,100%) !important;
+  margin:22px auto 0 !important;
+  align-items:center !important;
+  gap:12px !important;
+  direction:ltr !important;
+}
+.section-heading .games-catalog-tools::before,
+.section-heading .games-catalog-tools::after { display:none !important; content:none !important; }
+.section-heading .games-catalog-tools input {
+  all:unset !important;
+  box-sizing:border-box !important;
+  display:block !important;
+  flex:1 1 auto !important;
+  min-width:0 !important;
+  height:46px !important;
+  padding:0 15px !important;
+  color:#f5f5f5 !important;
+  background:#151515 !important;
+  border:1px solid #383838 !important;
+  border-radius:8px !important;
+  font:14px 'Cairo',sans-serif !important;
+  text-align:right !important;
+  direction:rtl !important;
+}
+.section-heading .games-catalog-tools input:focus { border-color:#ff7025 !important; }
+.section-heading .games-catalog-tools span {
+  all:unset !important;
+  box-sizing:border-box !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-width:72px !important;
+  height:36px !important;
+  padding:0 9px !important;
+  color:#ff8a36 !important;
+  background:rgba(255,112,37,.1) !important;
+  border:1px solid rgba(255,112,37,.25) !important;
+  border-radius:7px !important;
+  font:700 11px 'Cairo',sans-serif !important;
+  white-space:nowrap !important;
+}
+@media(max-width:600px) {
+ .games-section { width:calc(100% - 26px) !important; }
+ .section-heading .games-catalog-tools { width:100% !important; gap:8px !important; margin-top:16px !important; }
+ .section-heading .games-catalog-tools input { height:43px !important; font-size:13px !important; }
+ .section-heading .games-catalog-tools span { min-width:65px !important; font-size:10px !important; }
+}
