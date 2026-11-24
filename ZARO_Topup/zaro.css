@@ -3325,3 +3325,61 @@ h1, h2, h3, p, span, a, strong, small {
   .games-catalog-tools { flex-wrap: wrap; }
   .games-catalog-tools input { width: 100%; flex-basis: 100%; }
 }
+
+
+/* ZARO MOBILE PORTRAIT FIX - deployed from ChatGPT */
+@media (max-width: 600px) {
+  html, body { width:100%; max-width:100%; overflow-x:hidden; }
+  .navbar {
+    width:calc(100% - 24px); margin:10px auto 18px; padding:11px 12px;
+    display:grid; grid-template-columns:1fr auto; gap:8px 10px; min-height:0;
+  }
+  .navbar nav, .navbar .nav-links {
+    grid-column:1 / -1; width:100%; display:flex; justify-content:space-between;
+    gap:9px; overflow-x:auto; white-space:nowrap; scrollbar-width:none;
+  }
+  .navbar nav::-webkit-scrollbar, .navbar .nav-links::-webkit-scrollbar { display:none; }
+  .hero { width:calc(100% - 28px); display:flex; flex-direction:column; gap:8px; margin:18px auto 42px; }
+  .hero-content { width:100%; padding:12px 0 0; }
+  .hero h1 { font-size:clamp(30px,9vw,43px); line-height:1.2; }
+  .hero-visual { width:100%; height:auto; min-height:0; padding:24px 0 36px; overflow:visible; }
+  .logo-container {
+    width:min(82%,300px); height:auto; min-height:0; aspect-ratio:0.88 / 1;
+    padding:14px; transform:none !important; animation:none !important;
+    margin-inline:auto;
+  }
+  .logo-container img { width:92%; height:auto; max-height:210px; object-fit:contain; }
+  .orbit-a { width:min(78vw,300px); height:min(78vw,300px); }
+  .orbit-b { width:min(62vw,235px); height:min(62vw,235px); }
+  .visual-index { right:50%; transform:translateX(50%); bottom:3px; white-space:nowrap; }
+  .hero-scroll { display:none; }
+  .brand-statement, .features-section, .final-section { width:calc(100% - 28px); margin:38px auto; }
+  .statement-content h2, .features-heading h2, .final-content h2 { font-size:clamp(25px,8vw,34px); line-height:1.3; }
+  .statement-content p { font-size:13px; line-height:1.9; }
+  .games-page { padding:20px 13px 50px; }
+  .games-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .game-card { min-width:0; min-height:210px; padding:13px 10px; }
+  .game-cover { width:100%; height:105px; object-fit:cover; }
+  .game-info h3 { font-size:13px; overflow-wrap:anywhere; }
+  .game-details { width:100%; padding:22px 12px 55px; }
+  .game-banner { min-height:0; padding:22px 14px; }
+  .game-banner h1 { font-size:clamp(24px,7.5vw,34px); }
+  .topup-form, .topup-side, .order-summary { min-width:0; padding:16px 12px; }
+  .diamond-packages { grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+  .diamond-card { min-width:0; min-height:120px; padding:11px 7px; }
+  .orders-container, .support-container { width:calc(100% - 24px); padding:25px 0 50px; }
+  .support-layout { grid-template-columns:minmax(0,1fr); gap:14px; }
+  .support-form, .order-card, .support-info-card { padding:16px 13px; }
+  input, select, textarea, button { max-width:100%; }
+  .game-card:hover, .diamond-card:hover { transform:none; }
+}
+@media (max-width: 380px) {
+  .navbar { width:calc(100% - 18px); padding:9px; }
+  .navbar nav, .navbar .nav-links { gap:7px; }
+  .navbar nav a, .navbar .nav-links a { font-size:10px; }
+  .games-grid { gap:8px; }
+  .game-card { min-height:195px; padding:11px 8px; }
+  .game-cover { height:92px; }
+  .hero h1 { font-size:30px; }
+  .logo-container { width:min(84%,270px); }
+}
