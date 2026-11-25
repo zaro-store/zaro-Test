@@ -197,7 +197,7 @@ class _ZaroShellState extends State<ZaroShell> {
       textDirection: arabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         body: SafeArea(bottom: false, child: maintenanceMode ? const _MaintenancePage() : IndexedStack(index: tab, children: pages)),
-        bottomNavigationBar: Container(
+        bottomNavigationBar: maintenanceMode ? null : Container(
           decoration: BoxDecoration(
             color: const Color(0xFF090909),
             border: Border(top: BorderSide(color: orange.withOpacity(.85), width: 1.2)),
