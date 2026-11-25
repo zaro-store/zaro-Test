@@ -379,6 +379,7 @@ class GameDetailPage extends StatefulWidget {
 class _GameDetailPageState extends State<GameDetailPage> {
   final player = TextEditingController();
   final zone = TextEditingController();
+  final promoCode = TextEditingController();
   List<Map<String, dynamic>> packages = [];
   String? selectedPackage;
   bool loading = true;
@@ -394,6 +395,7 @@ class _GameDetailPageState extends State<GameDetailPage> {
   void dispose() {
     player.dispose();
     zone.dispose();
+    promoCode.dispose();
     super.dispose();
   }
 
@@ -428,13 +430,14 @@ class _GameDetailPageState extends State<GameDetailPage> {
         'zoneId': zone.text.trim().isEmpty ? null : zone.text.trim(),
         'game': widget.game.name == 'MOBILE LEGENDS' ? 'Mobile Legends' : widget.game.name,
         'package': selectedPackage,
+        'promoCode': promoCode.text.trim().isEmpty ? null : promoCode.text.trim().toUpperCase(),
       });
       final data = Map<String, dynamic>.from(result.data as Map);
       if (result.status >= 400 || data['success'] != true) {
         throw Exception(data['error'] ?? 'تعذر تسجيل الطلب');
       }
       if (mounted) {
-        _message('تم تسجيل الطلب التجريبي رقم ' + data['orderId'].toString());
+        _message('تم تسجيل طلبك رقم ' + data['orderId'].toString() + ' وحالته قيد الانتظار.');
         Navigator.pop(context);
       }
     } catch (e) {
@@ -485,10 +488,12 @@ class _GameDetailPageState extends State<GameDetailPage> {
           );
         }),
         const SizedBox(height: 18),
+        _field(promoCode, 'كود الخصم (اختياري)'),
+        const SizedBox(height: 18),
         SizedBox(height: 52, child: FilledButton(
           onPressed: sending || packages.isEmpty ? null : submitOrder,
           style: FilledButton.styleFrom(backgroundColor: orange, foregroundColor: Colors.black),
-          child: Text(sending ? 'جاري التسجيل...' : 'تسجيل الطلب التجريبي', style: const TextStyle(fontWeight: FontWeight.w900)),
+          child: Text(sending ? 'جاري التسجيل...' : 'إرسال الطلب', style: const TextStyle(fontWeight: FontWeight.w900)),
         )),
         const SizedBox(height: 10),
         const Text('لا يوجد دفع أو شحن حقيقي قبل اعتماد المورد وتفعيل الباقات.', textAlign: TextAlign.center, style: TextStyle(color: muted, fontSize: 11)),
