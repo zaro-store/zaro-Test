@@ -264,7 +264,7 @@ $("promotionsList")?.addEventListener("click",async e=>{
  notify(next?"تم تفعيل العرض.":"تم إيقاف العرض.");await loadPlatformControl();
 });
 $("promotionForm")?.addEventListener("submit",async e=>{
- e.preventDefault();const {error}=await supabase.from("app_promotions").insert({code:$("promotionCode").value.trim().toUpperCase()||null,title:$("promotionTitle").value.trim(),discount_type:$("promotionType").value,discount_value:Number($("promotionValue").value),is_active:true});
+ e.preventDefault();const startsText=$("promotionStartsAt").value,endsText=$("promotionEndsAt").value,maxText=$("promotionMaxUses").value.trim();const startsAt=startsText?new Date(startsText).toISOString():null,endsAt=endsText?new Date(endsText).toISOString():null,maxUses=maxText?Number(maxText):null;if((maxUses!==null&&(!Number.isInteger(maxUses)||maxUses<1))||(startsAt&&endsAt&&new Date(endsAt)<=new Date(startsAt))){notify("راجع حد الاستخدام وتواريخ العرض.");return;}const {error}=await supabase.from("app_promotions").insert({code:$("promotionCode").value.trim().toUpperCase()||null,title:$("promotionTitle").value.trim(),discount_type:$("promotionType").value,discount_value:Number($("promotionValue").value),max_uses:maxUses,starts_at:startsAt,ends_at:endsAt,is_active:true});
  if(error){notify("تعذر إنشاء العرض: "+error.message);return;}e.target.reset();notify("تم إنشاء العرض. تطبيق الخصم على الطلبات يحتاج ربطًا بمسار الدفع.");await loadPlatformControl();
 });
 $("appSettingsList")?.addEventListener("change",async e=>{
