@@ -2,9 +2,6 @@ name: Build ZARO Android Release
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/android-apk.yml'
 
 permissions:
   contents: write
