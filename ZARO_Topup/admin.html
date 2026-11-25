@@ -111,7 +111,7 @@
       <div class="welcome-banner"><div><span>ZARO APP CONTROL</span><h2>مركز إدارة تطبيق ZARO</h2><p>إدارة التطبيق والموقع من لوحة واحدة وبنفس هوية ZARO.</p></div><div class="welcome-icon"><i class="fa-solid fa-mobile-screen-button"></i></div></div>
       <div class="stats-grid">
         <article class="stat-card"><div class="stat-icon orange"><i class="fa-solid fa-mobile-screen-button"></i></div><span>تطبيق ZARO</span><strong>Android</strong><small>واجهة التطبيق موجودة</small></article>
-        <article class="stat-card"><div class="stat-icon blue"><i class="fa-solid fa-database"></i></div><span>قاعدة البيانات المشتركة</span><strong>Supabase</strong><small>تحتاج مزامنة التطبيق معها</small></article>
+        <article class="stat-card"><div class="stat-icon blue"><i class="fa-solid fa-database"></i></div><span>قاعدة البيانات المشتركة</span><strong>Supabase</strong><small>التطبيق يستخدم نفس الحسابات والطلبات والدعم</small></article>
         <article class="stat-card"><div class="stat-icon yellow"><i class="fa-solid fa-code-branch"></i></div><span>إدارة الإصدارات</span><strong>قيد الربط</strong><small>لا يتم نشر تحديث من هذه الصفحة حاليًا</small></article>
         <article class="stat-card"><div class="stat-icon green"><i class="fa-solid fa-layer-group"></i></div><span>إدارة المحتوى</span><strong>موحّدة</strong><small>الألعاب والباقات من إدارة المتجر</small></article>
       </div>
@@ -121,10 +121,15 @@
           <article class="app-management-card"><i class="fa-solid fa-gamepad"></i><div><strong>الألعاب والباقات</strong><p>تُدار من قسم الألعاب والباقات لتظهر بيانات موحدة على الموقع والتطبيق.</p><button class="mini-button" type="button" data-page="products">فتح إدارة الألعاب</button></div></article>
           <article class="app-management-card"><i class="fa-solid fa-bell"></i><div><strong>الإشعارات</strong><p>إدارة إشعارات التطبيق وربطها بخدمة إشعارات فعلية.</p><span class="app-state">غير مربوطة بعد</span></div></article>
           <article class="app-management-card"><i class="fa-solid fa-code-branch"></i><div><strong>إصدارات التطبيق</strong><p>متابعة رقم الإصدار وملف APK وسجل التحديثات.</p><span class="app-state">تحتاج ربط مسار النشر</span></div></article>
-          <article class="app-management-card"><i class="fa-solid fa-users"></i><div><strong>حسابات العملاء والرتب</strong><p>توحيد حسابات المستخدمين ونقاط الترقية والرتب بين التطبيق والموقع.</p><span class="app-state">تحتاج استكمال نظام الرتب</span></div></article>
+          <article class="app-management-card"><i class="fa-solid fa-users"></i><div><strong>حسابات العملاء والرتب</strong><p>إدارة ZARO ID ونقاط الترقية والرتب للحسابات المشتركة بين التطبيق والموقع.</p><span class="app-state">مرتبط بقاعدة البيانات</span></div></article>
           <article class="app-management-card"><i class="fa-solid fa-cart-shopping"></i><div><strong>الطلبات</strong><p>الطلبات تُدار من نفس قسم الطلبات الموجود بلوحة المتجر.</p><button class="mini-button" type="button" data-page="orders">فتح إدارة الطلبات</button></div></article>
         </div>
-        <div class="health-warning"><i class="fa-solid fa-circle-info"></i><span>القسم أُضيف للوحة الإدارة. التحكم الفعلي في إعدادات التطبيق والإشعارات والإصدارات يحتاج ربط تطبيق Flutter بجدول إعدادات مشترك وخدمات النشر والإشعارات.</span></div>
+        <div class="content-card">
+          <div class="section-heading"><div><span>PLAYER PROGRESSION</span><h2>حسابات التطبيق والرتب والنقاط</h2></div><span class="section-note" id="appUsersCount">0 حساب</span></div>
+          <p class="section-note">عند تفعيل حساب العميل يتخصص له ZARO ID ويتزامن تلقائيًا مع التطبيق. تعديل النقاط يسجل في سجل النقاط ويعيد حساب الرتبة.</p>
+          <div class="table-wrapper"><table><thead><tr><th>ZARO ID</th><th>الاسم</th><th>الرتبة الحالية</th><th>النقاط</th><th>تعديل النقاط</th><th>سبب التعديل</th><th>تنفيذ</th></tr></thead><tbody id="appUsersTable"><tr><td colspan="7">جاري تحميل حسابات التطبيق...</td></tr></tbody></table></div>
+        </div>
+        <div class="health-warning"><i class="fa-solid fa-circle-info"></i><span>الألعاب والباقات والطلبات والدعم وحسابات العملاء أصبحت مشتركة بين الموقع والتطبيق. إدارة إشعارات الدفع الفعلية ونشر الإصدارات من اللوحة ما زالت تحتاج ربط خدمة خارجية.</span></div>
       </div>
     </section>
 
