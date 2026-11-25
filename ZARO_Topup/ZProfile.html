@@ -169,13 +169,23 @@
       event.preventDefault(); if (busy) return;
       authFeedback.textContent = "";
       setBusy(loginForm, true);
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: $("loginEmail").value.trim(),
-        password: $("loginPassword").value
-      });
-      setBusy(loginForm, false);
-      if (error) { authFeedback.textContent = error.message.includes("Invalid login credentials") ? "ZARO ID أو كلمة المرور غير صحيحة." : "تعذر تسجيل الدخول: " + error.message; return; }
-      await renderProfile(data.user);
+      try {
+        const response = await supabase.functions.invoke("zaro-id-login", {
+          body: { zaroId: $("loginEmail").value.trim().toUpperCase(), password: $("loginPassword").value }
+        });
+        if (response.status >= 400) throw new Error(response.data?.error || "بيانات الدخول غير صحيحة.");
+        const authData = response.data;
+        const { data, error } = await supabase.auth.setSession({
+          access_token: authData.access_token,
+          refresh_token: authData.refresh_token
+        });
+        if (error) throw error;
+        setBusy(loginForm, false);
+        await renderProfile(data.user);
+      } catch (error) {
+        setBusy(loginForm, false);
+        authFeedback.textContent = "تعذر تسجيل الدخول: " + error.message;
+      }
     });
     registerForm.addEventListener("submit", async event => {
       event.preventDefault(); if (busy) return;
