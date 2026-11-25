@@ -50,7 +50,7 @@
       <div id="authArea">
         <div class="profile-tabs"><button type="button" id="showLogin" class="active">تسجيل الدخول</button><button type="button" id="showRegister">إنشاء حساب</button></div>
         <form id="loginForm" class="profile-form">
-          <label for="loginEmail">ZARO ID</label><input id="loginEmail" type="text" autocomplete="username" placeholder="ZARO-000001" required>
+          <label for="loginEmail">ZARO ID أو البريد الإلكتروني</label><input id="loginEmail" type="text" autocomplete="username" placeholder="ZARO-000001 أو name@example.com" required>
           <label for="loginPassword">كلمة المرور</label><input id="loginPassword" type="password" autocomplete="current-password" minlength="6" placeholder="كلمة المرور" required>
           <button class="profile-primary" type="submit">دخول إلى حسابي</button>
         </form>
@@ -170,17 +170,29 @@
       authFeedback.textContent = "";
       setBusy(loginForm, true);
       try {
-        const { data: authData, error: invokeError } = await supabase.functions.invoke("zaro-id-login", {
-          body: { zaroId: $("loginEmail").value.trim().toUpperCase(), password: $("loginPassword").value }
-        });
-        if (invokeError) throw new Error(invokeError.message || "بيانات الدخول غير صحيحة.");
-        const { data, error } = await supabase.auth.setSession({
-          access_token: authData.access_token,
-          refresh_token: authData.refresh_token
-        });
-        if (error) throw error;
+        const identifier = $("loginEmail").value.trim();
+        let user;
+        if (identifier.includes("@")) {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: identifier,
+            password: $("loginPassword").value
+          });
+          if (error) throw error;
+          user = data.user;
+        } else {
+          const { data: authData, error: invokeError } = await supabase.functions.invoke("zaro-id-login", {
+            body: { zaroId: identifier.toUpperCase(), password: $("loginPassword").value }
+          });
+          if (invokeError) throw new Error(invokeError.message || "بيانات الدخول غير صحيحة.");
+          const { data, error } = await supabase.auth.setSession({
+            access_token: authData.access_token,
+            refresh_token: authData.refresh_token
+          });
+          if (error) throw error;
+          user = data.user;
+        }
         setBusy(loginForm, false);
-        await renderProfile(data.user);
+        await renderProfile(user);
       } catch (error) {
         setBusy(loginForm, false);
         authFeedback.textContent = "تعذر تسجيل الدخول: " + error.message;
