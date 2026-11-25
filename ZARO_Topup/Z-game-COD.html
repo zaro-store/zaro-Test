@@ -147,12 +147,14 @@
 
 <script src="zaro.js"></script>
 
-<script>
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 const SUPABASE_URL =
     "https://rtqdcbkttrxbmglzllmv.supabase.co";
 
 const SUPABASE_KEY =
     "sb_publishable_iqwtKiJMmx9QEO4l1Zo7iQ_kHvZZH0c";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const packageCards = document.querySelectorAll(".diamond-card");
 const selectedPackage = document.getElementById("selectedPackage");
@@ -191,13 +193,16 @@ confirmOrder.addEventListener("click", async () => {
     confirmOrder.textContent = "جاري تسجيل الطلب...";
 
     try {
-        const response = await fetch(
+        const { data: { session } } = await supabase.auth.getSession();
+
+const response = await fetch(
             `${SUPABASE_URL}/functions/v1/create-order`,
             {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "apikey": SUPABASE_KEY
+                    "apikey": SUPABASE_KEY,
+                    ...(session ? { "Authorization": "Bearer " + session.access_token } : {})
                 },
                 body: JSON.stringify({
                     playerId: playerId,
