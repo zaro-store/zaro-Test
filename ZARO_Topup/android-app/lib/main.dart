@@ -38,6 +38,23 @@ class ZaroApp extends StatelessWidget {
   );
 }
 
+class _MaintenancePage extends StatelessWidget {
+  const _MaintenancePage();
+  @override
+  Widget build(BuildContext context) => const Center(child: Padding(
+    padding: EdgeInsets.all(28),
+    child: Column(mainAxisSize: MainAxisSize.min, children: [
+      Icon(Icons.build_circle_outlined, color: yellow, size: 62),
+      SizedBox(height: 18),
+      Text('ZARO.', style: TextStyle(color: orange, fontSize: 34, fontWeight: FontWeight.w900)),
+      SizedBox(height: 10),
+      Text('المتجر تحت الصيانة', style: TextStyle(color: yellow, fontSize: 22, fontWeight: FontWeight.w900)),
+      SizedBox(height: 8),
+      Text('بنحسّن الخدمة حاليًا. حاول مرة تانية بعد قليل.', textAlign: TextAlign.center, style: TextStyle(color: white, height: 1.7)),
+    ]),
+  ));
+}
+
 class Game {
   final String name;
   final String slug;
@@ -64,6 +81,7 @@ class ZaroShell extends StatefulWidget {
 class _ZaroShellState extends State<ZaroShell> {
   int tab = 0;
   bool arabic = true;
+  bool maintenanceMode = false;
   User? user;
   late final authSub = supabase.auth.onAuthStateChange.listen((state) {
     if (mounted) setState(() => user = state.session?.user);
@@ -73,7 +91,14 @@ class _ZaroShellState extends State<ZaroShell> {
   void initState() {
     super.initState();
     user = supabase.auth.currentUser;
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkForUpdates());
+    WidgetsBinding.instance.addPostFrameCallback((_) async { await _checkPlatformSettings(); await _checkForUpdates(); });
+  }
+
+  Future<void> _checkPlatformSettings() async {
+    try {
+      final row = await supabase.from('app_settings').select('setting_value').eq('setting_key', 'maintenance_mode').maybeSingle();
+      if (mounted) setState(() => maintenanceMode = row?['setting_value'] == true);
+    } catch (e) { debugPrint('ZARO platform settings failed: $e'); }
   }
 
   Future<void> _checkForUpdates() async {
@@ -146,7 +171,7 @@ class _ZaroShellState extends State<ZaroShell> {
     return Directionality(
       textDirection: arabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
-        body: SafeArea(bottom: false, child: IndexedStack(index: tab, children: pages)),
+        body: SafeArea(bottom: false, child: maintenanceMode ? const _MaintenancePage() : IndexedStack(index: tab, children: pages)),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
             color: const Color(0xFF090909),
