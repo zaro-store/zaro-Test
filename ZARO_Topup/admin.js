@@ -36,7 +36,7 @@ function renderOrders(){
  $("recentOrders").innerHTML=orders.length?orders.slice(0,6).map(o=>'<tr><td>#'+escapeHTML(o.id)+'</td><td>'+escapeHTML(o.game)+'</td><td>'+escapeHTML(o.player_id)+'</td><td>'+escapeHTML(o.package)+'</td><td>'+money(o.amount)+'</td><td><span class="order-status '+statusClass(o.status)+'">'+statusText(o.status)+'</span></td></tr>').join(""):'<tr><td colspan="6">لا توجد طلبات حتى الآن.</td></tr>';
  $("allOrders").innerHTML=filtered.length?filtered.map(o=>orderRow(o,true)).join(""):'<tr><td colspan="9">لا توجد نتائج مطابقة.</td></tr>';
  $("ordersResultCount").textContent=filtered.length+" طلب";
- $("pendingNavCount").textContent=orders.filter(o=>o.status==="pending").length;
+ $("pendingNavCount").textContent=orders.length.toLocaleString("ar-EG");
 }
 function updateStats(){
  const done=orders.filter(o=>o.status==="completed"),pending=orders.filter(o=>o.status==="pending");
