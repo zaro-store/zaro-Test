@@ -9,8 +9,8 @@ const yellow = Color(0xFFFFC400);
 const white = Color(0xFFF7F7F7);
 const muted = Color(0xFFB9B9B9);
 final supabase = Supabase.instance.client;
-const int zaroBuildNumber = 3;
-const String zaroVersionName = '1.0.2';
+const int zaroBuildNumber = 4;
+const String zaroVersionName = '1.0.3';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
