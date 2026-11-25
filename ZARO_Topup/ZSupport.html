@@ -227,28 +227,53 @@ function showConversation(data){
 }
 async function refreshConversation(){
  if(!access)return;
+ if(access.mode==="account"){
+  const {data:ticket,error:ticketError}=await supabase.from("support_tickets").select("id,subject,status,created_at,updated_at").eq("id",access.ticketId).single();
+  if(ticketError){messages.textContent="تعذر تحميل المحادثة: "+ticketError.message;return;}
+  const {data:thread,error:messagesError}=await supabase.from("support_messages").select("id,sender_role,body,created_at").eq("ticket_id",access.ticketId).order("created_at",{ascending:true});
+  if(messagesError){messages.textContent="تعذر تحميل الرسائل: "+messagesError.message;return;}
+  showConversation({ticket,messages:thread||[]});
+  return;
+ }
  const {data,error}=await supabase.rpc("zaro_get_customer_conversation",{p_ticket_id:access.ticketId,p_token:access.token});
  if(error){messages.textContent="تعذر تحميل المحادثة: "+error.message;return;}
  showConversation(data);
 }
-try{access=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");if(access?.ticketId&&access?.token)refreshConversation();}catch{access=null;}
+try{access=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");if(access?.ticketId&&(access?.token||access?.mode==="account"))refreshConversation();}catch{access=null;}
 form.addEventListener("submit",async e=>{
  e.preventDefault();
  const name=$("supportName").value.trim(),email=$("supportEmail").value.trim(),subject=$("supportSubject").value,body=$("supportMessage").value.trim();
  if(!name||!email||!subject||!body){feedback.textContent="من فضلك املى كل البيانات.";return;}
  const button=form.querySelector('button[type="submit"]');button.disabled=true;feedback.textContent="جاري إرسال رسالتك...";
- const token=makeToken();
- const {data:ticketId,error}=await supabase.rpc("zaro_create_support_ticket",{p_name:name,p_email:email,p_subject:subject,p_body:body,p_token:token});
+ const {data:{session}}=await supabase.auth.getSession();
+ let ticketId,error,token=null;
+ if(session){
+  const result=await supabase.rpc("zaro_app_create_support_ticket",{p_subject:subject,p_body:body});
+  ticketId=result.data;error=result.error;
+  if(!error)access={ticketId,mode:"account"};
+ }else{
+  token=makeToken();
+  const result=await supabase.rpc("zaro_create_support_ticket",{p_name:name,p_email:email,p_subject:subject,p_body:body,p_token:token});
+  ticketId=result.data;error=result.error;
+  if(!error)access={ticketId,token,mode:"guest"};
+ }
  button.disabled=false;
  if(error){feedback.textContent="تعذر إرسال الرسالة: "+error.message;console.error(error);return;}
- access={ticketId,token};localStorage.setItem(STORAGE_KEY,JSON.stringify(access));form.reset();
- feedback.textContent="تم إرسال رسالتك. احتفظ بنفس المتصفح لمتابعة المحادثة والرد.";
+ localStorage.setItem(STORAGE_KEY,JSON.stringify(access));form.reset();
+ feedback.textContent=session?"تم إرسال تذكرتك وربطها بحسابك. تقدر تتابعها من التطبيق أو الموقع.":"تم إرسال رسالتك. احتفظ بنفس المتصفح لمتابعة المحادثة والرد.";
  await refreshConversation();
 });
 replyForm.addEventListener("submit",async e=>{
  e.preventDefault();if(!access)return;const body=replyInput.value.trim();if(!body)return;
  const button=replyForm.querySelector("button");button.disabled=true;replyFeedback.textContent="جاري إرسال ردك...";
- const {error}=await supabase.rpc("zaro_send_customer_message",{p_ticket_id:access.ticketId,p_token:access.token,p_body:body});
+ let error;
+ if(access.mode==="account"){
+  const result=await supabase.rpc("zaro_app_send_support_message",{p_ticket_id:access.ticketId,p_body:body});
+  error=result.error;
+ }else{
+  const result=await supabase.rpc("zaro_send_customer_message",{p_ticket_id:access.ticketId,p_token:access.token,p_body:body});
+  error=result.error;
+ }
  button.disabled=false;if(error){replyFeedback.textContent="تعذر إرسال الرد: "+error.message;return;}
  replyInput.value="";replyFeedback.textContent="تم إرسال رسالتك.";await refreshConversation();
 });
