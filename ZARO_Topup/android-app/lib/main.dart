@@ -86,7 +86,7 @@ class _ZaroShellState extends State<ZaroShell> {
       final latestBuild = (row['build_number'] as num?)?.toInt() ?? 0;
       final minimumBuild = (row['min_supported_build'] as num?)?.toInt() ?? 1;
       if (latestBuild <= zaroBuildNumber) return;
-      final mandatory = row['is_mandatory'] == true || zaroBuildNumber < minimumBuild;
+      final mandatory = (row['is_mandatory'] == true || zaroBuildNumber < minimumBuild) && urlText.isNotEmpty;
       final notes = row['release_notes'] is Map
           ? ((row['release_notes'] as Map)['ar'] ?? '').toString() : '';
       final urlText = (row['download_url'] ?? '').toString();
