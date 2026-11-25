@@ -160,8 +160,11 @@
               <form id="promotionForm" class="admin-inline-form">
                 <input id="promotionCode" placeholder="كود الخصم">
                 <input id="promotionTitle" placeholder="اسم العرض" required>
-                <select id="promotionType"><option value="percentage">نسبة مئوية</option><option value="fixed">خصم ثابت</option><option value="bonus_points">نقاط إضافية</option></select>
-                <input id="promotionValue" type="number" min="0.01" step="0.01" placeholder="قيمة العرض" required>
+                <select id="promotionType"><option value="percentage">نسبة مئوية</option><option value="fixed">خصم ثابت</option></select>
+                <input id="promotionValue" type="number" min="0.01" step="0.01" placeholder="قيمة الخصم" required>
+                <input id="promotionMaxUses" type="number" min="1" step="1" placeholder="حد الاستخدام (اختياري)">
+                <input id="promotionStartsAt" type="datetime-local" aria-label="بداية العرض">
+                <input id="promotionEndsAt" type="datetime-local" aria-label="نهاية العرض">
                 <button class="mini-button" type="submit">إنشاء عرض</button>
               </form>
               <div id="promotionsList" class="small-note">جاري التحميل...</div>
