@@ -50,7 +50,7 @@
       <div id="authArea">
         <div class="profile-tabs"><button type="button" id="showLogin" class="active">تسجيل الدخول</button><button type="button" id="showRegister">إنشاء حساب</button></div>
         <form id="loginForm" class="profile-form">
-          <label for="loginEmail">البريد الإلكتروني</label><input id="loginEmail" type="email" autocomplete="email" placeholder="name@example.com" required>
+          <label for="loginEmail">ZARO ID</label><input id="loginEmail" type="text" autocomplete="username" placeholder="ZARO-000001" required>
           <label for="loginPassword">كلمة المرور</label><input id="loginPassword" type="password" autocomplete="current-password" minlength="6" placeholder="كلمة المرور" required>
           <button class="profile-primary" type="submit">دخول إلى حسابي</button>
         </form>
@@ -174,7 +174,7 @@
         password: $("loginPassword").value
       });
       setBusy(loginForm, false);
-      if (error) { authFeedback.textContent = error.message.includes("Invalid login credentials") ? "البريد الإلكتروني أو كلمة المرور غير صحيحة." : "تعذر تسجيل الدخول: " + error.message; return; }
+      if (error) { authFeedback.textContent = error.message.includes("Invalid login credentials") ? "ZARO ID أو كلمة المرور غير صحيحة." : "تعذر تسجيل الدخول: " + error.message; return; }
       await renderProfile(data.user);
     });
     registerForm.addEventListener("submit", async event => {
