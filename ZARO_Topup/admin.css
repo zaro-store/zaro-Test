@@ -784,3 +784,17 @@ button,input,select,textarea{font-family:inherit}
 .app-management-card p{font-size:11px;color:#999;line-height:1.9;margin:6px 0 10px}
 .app-state{display:inline-block;font-size:10px;color:#ffc857}
 @media(max-width:760px){.sidebar{z-index:1000;max-height:100dvh;overflow-y:auto;overscroll-behavior:contain}.sidebar-nav{padding-bottom:12px}.nav-item{min-height:46px;touch-action:manipulation}.mobile-menu-button{position:relative;z-index:1001;touch-action:manipulation}.dashboard-main{position:relative;z-index:1}.app-management-grid{grid-template-columns:1fr}}
+
+/* ZARO platform control center */
+.admin-inline-form{display:grid;gap:8px;margin-top:12px;width:100%}
+.admin-inline-form input,.admin-inline-form select,.admin-inline-form textarea{width:100%;min-width:0;padding:10px 11px;border:1px solid rgba(255,135,45,.24);border-radius:9px;background:#0d0d0d;color:#f5f5f5;font:12px Cairo,sans-serif;outline:none}
+.admin-inline-form input:focus,.admin-inline-form select:focus,.admin-inline-form textarea:focus{border-color:#ff7900;box-shadow:0 0 0 2px #ff790022}
+.admin-inline-form textarea{min-height:76px;resize:vertical}
+.admin-inline-form label{display:flex;align-items:center;gap:8px;color:#ddd;font-size:11px}
+.admin-inline-form label input{width:auto}
+#platformControlCenter>.content-card{margin-top:16px}
+#platformControlCenter .table-wrapper{overflow-x:auto}
+#platformControlCenter table{min-width:650px}
+#platformControlCenter td input{max-width:145px;padding:8px;border:1px solid #ffffff20;border-radius:7px;background:#0b0b0b;color:#fff;font:11px Cairo}
+#platformControlCenter .small-note{font-size:11px;line-height:1.9;color:#aaa;margin-top:9px}
+@media(max-width:760px){#platformControlCenter .app-management-card{display:block}#platformControlCenter .app-management-card>i{margin-bottom:9px}}
