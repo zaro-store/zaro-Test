@@ -170,11 +170,10 @@
       authFeedback.textContent = "";
       setBusy(loginForm, true);
       try {
-        const response = await supabase.functions.invoke("zaro-id-login", {
+        const { data: authData, error: invokeError } = await supabase.functions.invoke("zaro-id-login", {
           body: { zaroId: $("loginEmail").value.trim().toUpperCase(), password: $("loginPassword").value }
         });
-        if (response.status >= 400) throw new Error(response.data?.error || "بيانات الدخول غير صحيحة.");
-        const authData = response.data;
+        if (invokeError) throw new Error(invokeError.message || "بيانات الدخول غير صحيحة.");
         const { data, error } = await supabase.auth.setSession({
           access_token: authData.access_token,
           refresh_token: authData.refresh_token
