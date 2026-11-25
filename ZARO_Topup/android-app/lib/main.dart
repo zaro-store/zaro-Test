@@ -187,7 +187,7 @@ class _ZaroShellState extends State<ZaroShell> {
   @override
   Widget build(BuildContext context) {
     final pages = <Widget>[
-      HomePage(arabic: arabic, onGameTap: openGame, onSeeAll: () => setState(() => tab = 1), onAccount: () => setState(() => tab = 4)),
+      HomePage(arabic: arabic, user: user, onGameTap: openGame, onSeeAll: () => setState(() => tab = 1), onAccount: () => setState(() => tab = 4)),
       GamesPage(arabic: arabic, onGameTap: openGame),
       OrdersPage(arabic: arabic, user: user),
       SupportPage(arabic: arabic, user: user),
@@ -242,10 +242,11 @@ class _ZaroShellState extends State<ZaroShell> {
 
 class HomePage extends StatelessWidget {
   final bool arabic;
+  final User? user;
   final ValueChanged<Game> onGameTap;
   final VoidCallback onSeeAll;
   final VoidCallback onAccount;
-  const HomePage({super.key, required this.arabic, required this.onGameTap, required this.onSeeAll, required this.onAccount});
+  const HomePage({super.key, required this.arabic, required this.user, required this.onGameTap, required this.onSeeAll, required this.onAccount});
   String t(String ar, String en) => arabic ? ar : en;
 
   @override
