@@ -29,6 +29,9 @@ jobs:
       - name: Get packages
         working-directory: ZARO_Topup/android-app
         run: flutter pub get
+      - name: Generate ZARO launcher icon
+        working-directory: ZARO_Topup/android-app
+        run: dart run flutter_launcher_icons
       - name: Build release APK
         working-directory: ZARO_Topup/android-app
         run: flutter build apk --release
