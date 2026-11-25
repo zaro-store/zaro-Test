@@ -1,0 +1,35 @@
+{
+  "name": "zaro-admin-desktop",
+  "version": "1.0.0",
+  "description": "ZARO Admin Desktop",
+  "main": "main.js",
+  "author": "ZARO",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.zaro.admin",
+    "productName": "ZARO Admin",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ]
+    }
+  }
+}
