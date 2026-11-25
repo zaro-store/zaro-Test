@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:math' as math;
 
 const bg = Color(0xFF070707);
 const panel = Color(0xFF151515);
@@ -85,13 +87,36 @@ class _ZaroShellState extends State<ZaroShell> {
   User? user;
   late final authSub = supabase.auth.onAuthStateChange.listen((state) {
     if (mounted) setState(() => user = state.session?.user);
+    _registerDevice(state.session?.user);
   });
 
   @override
   void initState() {
     super.initState();
     user = supabase.auth.currentUser;
+    _registerDevice(user);
     WidgetsBinding.instance.addPostFrameCallback((_) async { await _checkPlatformSettings(); await _checkForUpdates(); });
+  }
+
+  Future<void> _registerDevice(User? activeUser) async {
+    if (activeUser == null) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      var deviceKey = prefs.getString('zaro_device_key');
+      if (deviceKey == null || deviceKey.isEmpty) {
+        final random = math.Random.secure();
+        deviceKey = List.generate(32, (_) => random.nextInt(16).toRadixString(16)).join();
+        await prefs.setString('zaro_device_key', deviceKey);
+      }
+      await supabase.from('app_devices').upsert({
+        'user_id': activeUser.id,
+        'platform': 'android',
+        'device_key': deviceKey,
+        'device_label': 'Android device',
+        'app_build': zaroBuildNumber,
+        'last_seen_at': DateTime.now().toUtc().toIso8601String(),
+      }, onConflict: 'user_id,platform,device_key');
+    } catch (e) { debugPrint('ZARO device registration failed: $e'); }
   }
 
   Future<void> _checkPlatformSettings() async {
