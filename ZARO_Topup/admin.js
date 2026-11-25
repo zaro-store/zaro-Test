@@ -9,7 +9,7 @@ const $ = (id) => document.getElementById(id);
 const loginSection = $("loginSection"), dashboardSection = $("dashboardSection");
 const loginForm = $("loginForm"), loginButton = $("loginButton"), loginMessage = $("loginMessage");
 const pageNames = {overview:"نظرة عامة",orders:"إدارة الطلبات",products:"الألعاب والباقات",customers:"العملاء",support:"الدعم الفني",settings:"إعدادات النظام",operations:"مركز التشغيل والتسعير",app:"إدارة التطبيق"};
-let orders=[], games=[], packages=[], customers=[], tickets=[], selectedTicket=null, currentUser=null;
+let orders=[], games=[], packages=[], customers=[], tickets=[], appUsers=[], selectedTicket=null, currentUser=null;
 
 function escapeHTML(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function money(v){return v===null||v===undefined||v===""?"غير محدد":Number(v).toLocaleString("ar-EG",{maximumFractionDigits:2})+" ج.م";}
@@ -75,6 +75,19 @@ function renderCustomers(){
  $("customersTable").innerHTML=rows.length?rows.map(c=>'<tr><td><strong>'+escapeHTML(c.zaro_id||"—")+'</strong></td><td>'+escapeHTML(c.full_name||"—")+'</td><td>'+escapeHTML(c.email||"—")+'</td><td>'+date(c.created_at)+'</td><td><span class="order-status '+statusClass(c.status)+'">'+statusText(c.status)+'</span></td><td><select class="row-action-select customer-state-select" data-id="'+escapeHTML(c.user_id)+'"><option value="pending" '+(c.status==="pending"?"selected":"")+'>معلق</option><option value="active" '+(c.status==="active"?"selected":"")+'>نشط</option><option value="rejected" '+(c.status==="rejected"?"selected":"")+'>مرفوض</option><option value="suspended" '+(c.status==="suspended"?"selected":"")+'>موقوف</option></select></td></tr>').join(""):'<tr><td colspan="6">لا توجد بيانات عملاء مطابقة.</td></tr>';
 }
 
+async function loadAppUsers(){
+ const {data,error}=await supabase.from("app_profiles")
+  .select("user_id,zaro_id,display_name,points,lifetime_spend,rank_code,is_suspended,created_at")
+  .order("created_at",{ascending:false});
+ if(error)throw error;
+ appUsers=data||[];
+ $("appUsersCount").textContent=appUsers.length+" حساب";
+ renderAppUsers();
+}
+function renderAppUsers(){
+ $("appUsersTable").innerHTML=appUsers.length?appUsers.map(u=>'<tr data-user-id="'+escapeHTML(u.user_id)+'"><td><strong>'+escapeHTML(u.zaro_id||"—")+'</strong></td><td>'+escapeHTML(u.display_name||"ZARO Player")+'</td><td><span class="order-status completed">'+escapeHTML((u.rank_code||"rookie").toUpperCase())+'</span></td><td>'+Number(u.points||0).toLocaleString("en-US")+'</td><td><input class="package-field app-points-delta" type="number" step="1" min="-100000" max="100000" placeholder="+50 أو -20"></td><td><input class="package-field app-points-reason" type="text" maxlength="200" placeholder="سبب التعديل"></td><td><button class="mini-button save-app-points" data-id="'+escapeHTML(u.user_id)+'">حفظ</button></td></tr>').join(""):'<tr><td colspan="7">لا توجد حسابات تطبيق حتى الآن.</td></tr>';
+}
+
 async function loadTickets(){
  const {data,error}=await supabase.from("support_tickets").select("*").order("created_at",{ascending:false});
  if(error)throw error;tickets=data||[];$("ticketsCount").textContent=tickets.filter(t=>t.status==="open").length;$("openTicketsCount").textContent=tickets.filter(t=>t.status==="open").length;renderTickets();
@@ -95,7 +108,7 @@ async function openTicket(id){
 
 async function loadAll(){
  $("refreshButton").classList.add("is-loading");
- const jobs=[["الطلبات",loadOrders],["الكتالوج",loadCatalog],["العملاء",loadCustomers],["الدعم",loadTickets]];
+ const jobs=[["الطلبات",loadOrders],["الكتالوج",loadCatalog],["العملاء",loadCustomers],["حسابات التطبيق",loadAppUsers],["الدعم",loadTickets]];
  const errors=[];
  for(const [name,fn] of jobs){try{await fn();}catch(e){console.error(name,e);errors.push(name+": "+e.message);}}
  $("refreshButton").classList.remove("is-loading");
@@ -153,10 +166,33 @@ $("packagesTable").addEventListener("click",async e=>{
  b.disabled=true;const {error}=await supabase.from("catalog_packages").update({supplier_sku:sku||null,supplier_cost:supplierCost,selling_price:sellingPrice,is_active:isActive,updated_at:new Date().toISOString()}).eq("id",id);b.disabled=false;
  if(error)notify("فشل حفظ الباقة: "+error.message);else notify("تم حفظ بيانات الباقة، ولم يتم تفعيلها.");await loadCatalog();
 });
+$("appUsersTable").addEventListener("click",async e=>{
+ const b=e.target.closest(".save-app-points");if(!b)return;
+ const row=b.closest("tr"),userId=b.dataset.id;
+ const delta=Number(row.querySelector(".app-points-delta").value);
+ const reason=row.querySelector(".app-points-reason").value.trim();
+ if(!Number.isInteger(delta)||delta===0){notify("اكتب عدد نقاط صحيح غير صفر.");return;}
+ if(reason.length<2){notify("اكتب سبب تعديل النقاط.");return;}
+ b.disabled=true;
+ const {data,error}=await supabase.rpc("zaro_admin_adjust_app_points",{p_user_id:userId,p_delta:delta,p_reason:reason});
+ b.disabled=false;
+ if(error){notify("تعذر تعديل النقاط: "+error.message);return;}
+ notify("تم تحديث النقاط إلى "+data+" وإعادة حساب الرتبة.");
+ await loadAppUsers();
+});
 $("customersTable").addEventListener("change",async e=>{
  const s=e.target.closest(".customer-state-select");if(!s)return;const id=s.dataset.id,status=s.value;s.disabled=true;
- const {error}=await supabase.from("customer_profiles").update({status,reviewed_at:new Date().toISOString(),reviewed_by:ADMIN_UID}).eq("user_id",id);
- if(error)notify("تعذر تحديث العميل: "+error.message);else notify("تم تحديث حالة العميل.");await loadCustomers();
+ let error=null;
+ if(status==="pending"){
+  const result=await supabase.from("customer_profiles").update({status,reviewed_at:new Date().toISOString(),reviewed_by:ADMIN_UID}).eq("user_id",id);
+  error=result.error;
+ }else{
+  const result=await supabase.rpc("zaro_review_customer",{p_user_id:id,p_decision:status});
+  error=result.error;
+ }
+ if(error)notify("تعذر تحديث العميل: "+error.message);
+ else notify(status==="active"?"تم تفعيل الحساب وتخصيص ZARO ID وربط ملف التطبيق.":"تم تحديث حالة العميل.");
+ await loadCustomers();await loadAppUsers();
 });
 $("ticketsList").addEventListener("click",e=>{const b=e.target.closest("[data-ticket-id]");if(b)openTicket(b.dataset.ticketId);});
 $("ticketStatus").addEventListener("change",async e=>{
