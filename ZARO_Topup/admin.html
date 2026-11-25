@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#080808"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="zaro-app-icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="zaro-app-icon.svg"><title>ZARO | Admin Control Center</title>
-<link rel="stylesheet" href="admin.css?v=20261120-3">
+<link rel="stylesheet" href="admin.css?v=20261125-1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -31,6 +31,8 @@
       <button class="nav-item" data-page="products"><i class="fa-solid fa-gamepad"></i><span>الألعاب والباقات</span></button>
       <button class="nav-item" data-page="customers"><i class="fa-solid fa-users"></i><span>العملاء</span></button>
       <button class="nav-item" data-page="support"><i class="fa-solid fa-headset"></i><span>الدعم الفني</span><b class="nav-count" id="openTicketsCount">0</b></button>
+      <span class="nav-label">إدارة التطبيق</span>
+      <button class="nav-item" data-page="app"><i class="fa-solid fa-mobile-screen-button"></i><span>إدارة التطبيق</span></button>
       <span class="nav-label">النظام</span>
       <button class="nav-item" data-page="operations"><i class="fa-solid fa-sliders"></i><span>التشغيل والتسعير</span></button>
       <button class="nav-item" data-page="settings"><i class="fa-solid fa-gear"></i><span>الإعدادات</span></button>
@@ -105,12 +107,33 @@
       </div>
     </section>
 
+    <section class="dashboard-page" id="page-app">
+      <div class="welcome-banner"><div><span>ZARO APP CONTROL</span><h2>مركز إدارة تطبيق ZARO</h2><p>إدارة التطبيق والموقع من لوحة واحدة وبنفس هوية ZARO.</p></div><div class="welcome-icon"><i class="fa-solid fa-mobile-screen-button"></i></div></div>
+      <div class="stats-grid">
+        <article class="stat-card"><div class="stat-icon orange"><i class="fa-solid fa-mobile-screen-button"></i></div><span>تطبيق ZARO</span><strong>Android</strong><small>واجهة التطبيق موجودة</small></article>
+        <article class="stat-card"><div class="stat-icon blue"><i class="fa-solid fa-database"></i></div><span>قاعدة البيانات المشتركة</span><strong>Supabase</strong><small>تحتاج مزامنة التطبيق معها</small></article>
+        <article class="stat-card"><div class="stat-icon yellow"><i class="fa-solid fa-code-branch"></i></div><span>إدارة الإصدارات</span><strong>قيد الربط</strong><small>لا يتم نشر تحديث من هذه الصفحة حاليًا</small></article>
+        <article class="stat-card"><div class="stat-icon green"><i class="fa-solid fa-layer-group"></i></div><span>إدارة المحتوى</span><strong>موحّدة</strong><small>الألعاب والباقات من إدارة المتجر</small></article>
+      </div>
+      <div class="content-card"><div class="section-heading"><div><span>APP MANAGEMENT</span><h2>أقسام إدارة التطبيق</h2></div></div>
+        <div class="app-management-grid">
+          <article class="app-management-card"><i class="fa-solid fa-house"></i><div><strong>الرئيسية والبنرات</strong><p>إعداد محتوى الصفحة الرئيسية للتطبيق من مصدر بيانات مشترك.</p><span class="app-state">بانتظار ربط إعدادات التطبيق</span></div></article>
+          <article class="app-management-card"><i class="fa-solid fa-gamepad"></i><div><strong>الألعاب والباقات</strong><p>تُدار من قسم الألعاب والباقات لتظهر بيانات موحدة على الموقع والتطبيق.</p><button class="mini-button" type="button" data-page="products">فتح إدارة الألعاب</button></div></article>
+          <article class="app-management-card"><i class="fa-solid fa-bell"></i><div><strong>الإشعارات</strong><p>إدارة إشعارات التطبيق وربطها بخدمة إشعارات فعلية.</p><span class="app-state">غير مربوطة بعد</span></div></article>
+          <article class="app-management-card"><i class="fa-solid fa-code-branch"></i><div><strong>إصدارات التطبيق</strong><p>متابعة رقم الإصدار وملف APK وسجل التحديثات.</p><span class="app-state">تحتاج ربط مسار النشر</span></div></article>
+          <article class="app-management-card"><i class="fa-solid fa-users"></i><div><strong>حسابات العملاء والرتب</strong><p>توحيد حسابات المستخدمين ونقاط الترقية والرتب بين التطبيق والموقع.</p><span class="app-state">تحتاج استكمال نظام الرتب</span></div></article>
+          <article class="app-management-card"><i class="fa-solid fa-cart-shopping"></i><div><strong>الطلبات</strong><p>الطلبات تُدار من نفس قسم الطلبات الموجود بلوحة المتجر.</p><button class="mini-button" type="button" data-page="orders">فتح إدارة الطلبات</button></div></article>
+        </div>
+        <div class="health-warning"><i class="fa-solid fa-circle-info"></i><span>القسم أُضيف للوحة الإدارة. التحكم الفعلي في إعدادات التطبيق والإشعارات والإصدارات يحتاج ربط تطبيق Flutter بجدول إعدادات مشترك وخدمات النشر والإشعارات.</span></div>
+      </div>
+    </section>
+
     <section class="dashboard-page" id="page-settings">
       <div class="content-card"><div class="section-heading"><div><span>SYSTEM SETTINGS</span><h2>إعدادات النظام</h2></div></div><div class="settings-grid"><div class="setting-tile"><i class="fa-solid fa-shield-halved"></i><div><strong>حماية لوحة الإدارة</strong><p>الدخول مقيد بحساب المدير المحدد، وقاعدة البيانات تستخدم RLS.</p></div><b class="setting-state">مفعّلة</b></div><div class="setting-tile"><i class="fa-solid fa-database"></i><div><strong>قاعدة البيانات</strong><p>Supabase متصل عبر المفتاح العام وجلسة المدير.</p></div><b class="setting-state">متصل</b></div><div class="setting-tile"><i class="fa-solid fa-credit-card"></i><div><strong>بوابة الدفع</strong><p>لم يتم ربط بوابة دفع أو تحقق آلي من المدفوعات.</p></div><b class="setting-state pending-state">غير مفعّلة</b></div><div class="setting-tile"><i class="fa-solid fa-truck-fast"></i><div><strong>مورد الشحن</strong><p>لم يتم ربط API مورد معتمد حتى الآن.</p></div><b class="setting-state pending-state">غير مربوط</b></div></div><div class="settings-footer"><div><strong>جلسة المدير الحالية</strong><p id="sessionEmail">—</p></div></div></div>
     </section>
   </main>
 </div>
-<script type="module" src="admin.js?v=20261120-3"></script>
+<script type="module" src="admin.js?v=20261125-1"></script>
 <script>
 let zaroInstallPrompt=null;
 const zaroInstallButton=document.getElementById("installAppButton");
