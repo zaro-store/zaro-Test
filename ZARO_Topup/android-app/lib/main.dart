@@ -441,16 +441,20 @@ class _AccountPageState extends State<AccountPage> {
     }
     setState(() { busy = true; feedback = ''; });
     try {
-      final response = await supabase.functions.invoke('zaro-id-login', body: {
-        'zaroId': id.text.trim().toUpperCase(),
-        'password': password.text,
-      });
-      if (response.status >= 400) {
-        final d = response.data is Map ? Map<String, dynamic>.from(response.data) : <String, dynamic>{};
-        throw Exception(d['error'] ?? 'بيانات الدخول غير صحيحة.');
+      if (id.text.trim().contains('@')) {
+        await supabase.auth.signInWithPassword(email: id.text.trim(), password: password.text);
+      } else {
+        final response = await supabase.functions.invoke('zaro-id-login', body: {
+          'zaroId': id.text.trim().toUpperCase(),
+          'password': password.text,
+        });
+        if (response.status >= 400) {
+          final d = response.data is Map ? Map<String, dynamic>.from(response.data) : <String, dynamic>{};
+          throw Exception(d['error'] ?? 'بيانات الدخول غير صحيحة.');
+        }
+        final data = Map<String, dynamic>.from(response.data as Map);
+        await supabase.auth.setSession(data['refresh_token'].toString(), accessToken: data['access_token'].toString());
       }
-      final data = Map<String, dynamic>.from(response.data as Map);
-      await supabase.auth.setSession(data['refresh_token'].toString(), accessToken: data['access_token'].toString());
     } catch (e) {
       setState(() => feedback = e.toString().replaceFirst('Exception: ', ''));
     } finally {
@@ -471,9 +475,9 @@ class _AccountPageState extends State<AccountPage> {
         data: {'full_name': name.text.trim()},
       );
       if (result.session == null) {
-        setState(() => feedback = 'تم إنشاء الحساب. افتح بريدك وأكد الحساب، وبعدها استنى موافقة الإدارة وتخصيص ZARO ID.');
+        setState(() => feedback = 'تم إنشاء الحساب. افتح بريدك وأكد الحساب، ثم ادخل بالبريد وكلمة المرور عشان تشوف ZARO ID الخاص بك.');
       } else {
-        setState(() => feedback = 'تم إنشاء الحساب. حسابك قيد المراجعة وسيظهر الـID بعد موافقة الإدارة.');
+        setState(() => feedback = 'تم إنشاء الحساب. اتخصص لك ZARO ID وحسابك قيد مراجعة الإدارة.');
       }
     } catch (e) {
       setState(() => feedback = 'تعذر إنشاء الحساب: ' + e.toString());
@@ -537,7 +541,7 @@ class _AccountPageState extends State<AccountPage> {
             ]),
           ),
           const SizedBox(height: 14),
-          _InfoPanel(text: status == 'active' ? 'حسابك نشط. تقدر تسجل طلبات وتستخدم مركز الدعم.' : 'حالة الحساب: ' + status + '. بعد موافقة الإدارة هيظهر رقم ZARO ID وتقدر تسجل طلبات.'),
+          _InfoPanel(text: status == 'active' ? 'حسابك نشط. تقدر تسجل طلبات وتستخدم مركز الدعم.' : 'حالة الحساب: ' + status + '. حسابك قيد مراجعة الإدارة. تقدر تستخدم الدعم، والطلبات هتتفعل بعد الموافقة.'),
           const SizedBox(height: 14),
           Row(children: [
             Expanded(child: _statCard('RANK', rank)),
