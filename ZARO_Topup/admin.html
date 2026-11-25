@@ -129,6 +129,52 @@
           <p class="section-note">عند إنشاء الحساب يتخصص له ZARO ID فورًا، وبعد موافقة الإدارة تتفعل الطلبات. تعديل النقاط يسجل في سجل النقاط ويعيد حساب الرتبة.</p>
           <div class="table-wrapper"><table><thead><tr><th>ZARO ID</th><th>الاسم</th><th>الرتبة الحالية</th><th>النقاط</th><th>تعديل النقاط</th><th>سبب التعديل</th><th>تنفيذ</th></tr></thead><tbody id="appUsersTable"><tr><td colspan="7">جاري تحميل حسابات التطبيق...</td></tr></tbody></table></div>
         </div>
+
+        <div class="content-card" id="platformControlCenter">
+          <div class="section-heading"><div><span>PLATFORM CONTROL CENTER</span><h2>مركز التحكم الكامل</h2></div><button class="mini-button" id="refreshPlatformData" type="button">تحديث البيانات</button></div>
+          <div class="app-management-grid">
+            <article class="app-management-card"><i class="fa-solid fa-code-branch"></i><div><strong>إدارة الإصدارات والتحديثات</strong><p>تسجيل إصدار Android وسياسة الحد الأدنى للإصدار ورابط التحديث.</p>
+              <form id="versionForm" class="admin-inline-form">
+                <input id="versionName" placeholder="رقم الإصدار مثل 1.1.0" required>
+                <input id="versionBuild" type="number" min="1" placeholder="Build number" required>
+                <input id="versionMinBuild" type="number" min="1" placeholder="أقل Build مدعوم" required>
+                <input id="versionUrl" type="url" placeholder="رابط APK أو صفحة الإصدار">
+                <input id="versionNotes" placeholder="ملاحظات الإصدار">
+                <label><input id="versionMandatory" type="checkbox"> تحديث إجباري</label>
+                <button class="mini-button" type="submit">نشر بيانات الإصدار</button>
+              </form>
+              <div id="versionsList" class="small-note">جاري التحميل...</div>
+            </div></article>
+            <article class="app-management-card"><i class="fa-solid fa-bell"></i><div><strong>مركز الإشعارات</strong><p>إرسال إشعار داخل التطبيق لكل المستخدمين أو لمستخدم محدد بواسطة ZARO ID.</p>
+              <form id="notificationForm" class="admin-inline-form">
+                <input id="notificationTitle" placeholder="عنوان الإشعار" required>
+                <textarea id="notificationBody" placeholder="محتوى الإشعار" required></textarea>
+                <input id="notificationZaroId" placeholder="ZARO ID (اتركه فارغًا للإرسال للجميع)">
+                <button class="mini-button" type="submit">إرسال الإشعار</button>
+              </form>
+            </div></article>
+            <article class="app-management-card"><i class="fa-solid fa-tags"></i><div><strong>العروض والكوبونات</strong><p>إدارة العروض النشطة وتواريخها. تفعيل الخصم في الدفع يحتاج ربطه بمسار الطلب قبل استخدامه تجاريًا.</p>
+              <form id="promotionForm" class="admin-inline-form">
+                <input id="promotionCode" placeholder="كود الخصم">
+                <input id="promotionTitle" placeholder="اسم العرض" required>
+                <select id="promotionType"><option value="percentage">نسبة مئوية</option><option value="fixed">خصم ثابت</option><option value="bonus_points">نقاط إضافية</option></select>
+                <input id="promotionValue" type="number" min="0.01" step="0.01" placeholder="قيمة العرض" required>
+                <button class="mini-button" type="submit">إنشاء عرض</button>
+              </form>
+              <div id="promotionsList" class="small-note">جاري التحميل...</div>
+            </div></article>
+            <article class="app-management-card"><i class="fa-solid fa-sliders"></i><div><strong>إعدادات ومفاتيح المميزات</strong><p>تشغيل وضع الصيانة والمميزات التي يقرأها التطبيق والموقع.</p>
+              <div id="featureFlagsList" class="admin-inline-form">جاري التحميل...</div>
+            </div></article>
+          </div>
+          <div class="content-card"><div class="section-heading"><div><span>WALLET CONTROL</span><h2>محافظ العملاء</h2></div></div><p class="small-note">تعديل الرصيد يسجل حركة مالية في دفتر مستقل. المحفظة غير مفعلة كوسيلة دفع حقيقية حتى ربط مزود دفع مرخص والتحقق منه.</p>
+            <div class="table-wrapper"><table><thead><tr><th>ZARO ID</th><th>العميل</th><th>الرصيد</th><th>تعديل الرصيد بالجنيه</th><th>السبب</th><th>تنفيذ</th></tr></thead><tbody id="walletsTable"><tr><td colspan="6">جاري التحميل...</td></tr></tbody></table></div>
+          </div>
+          <div class="content-card"><div class="section-heading"><div><span>SECURITY & DEVICES</span><h2>الأجهزة وسجل الإدارة</h2></div></div>
+            <div class="table-wrapper"><table><thead><tr><th>المنصة</th><th>الجهاز</th><th>Build</th><th>آخر نشاط</th></tr></thead><tbody id="devicesTable"><tr><td colspan="4">جاري التحميل...</td></tr></tbody></table></div>
+            <div class="table-wrapper"><table><thead><tr><th>العملية</th><th>القسم</th><th>المعرف</th><th>التفاصيل</th><th>التاريخ</th></tr></thead><tbody id="auditTable"><tr><td colspan="5">جاري التحميل...</td></tr></tbody></table></div>
+          </div>
+        </div>
         <div class="health-warning"><i class="fa-solid fa-circle-info"></i><span>الألعاب والباقات والطلبات والدعم وحسابات العملاء أصبحت مشتركة بين الموقع والتطبيق. إدارة إشعارات الدفع الفعلية ونشر الإصدارات من اللوحة ما زالت تحتاج ربط خدمة خارجية.</span></div>
       </div>
     </section>
@@ -138,7 +184,7 @@
     </section>
   </main>
 </div>
-<script type="module" src="admin.js?v=20261125-5"></script>
+<script type="module" src="admin.js?v=20261125-6"></script>
 <script>
 let zaroInstallPrompt=null;
 const zaroInstallButton=document.getElementById("installAppButton");
