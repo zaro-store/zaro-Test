@@ -8,7 +8,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = (id) => document.getElementById(id);
 const loginSection = $("loginSection"), dashboardSection = $("dashboardSection");
 const loginForm = $("loginForm"), loginButton = $("loginButton"), loginMessage = $("loginMessage");
-const pageNames = {overview:"نظرة عامة",orders:"إدارة الطلبات",products:"الألعاب والباقات",customers:"العملاء",support:"الدعم الفني",settings:"إعدادات النظام",operations:"مركز التشغيل والتسعير"};
+const pageNames = {overview:"نظرة عامة",orders:"إدارة الطلبات",products:"الألعاب والباقات",customers:"العملاء",support:"الدعم الفني",settings:"إعدادات النظام",operations:"مركز التشغيل والتسعير",app:"إدارة التطبيق"};
 let orders=[], games=[], packages=[], customers=[], tickets=[], selectedTicket=null, currentUser=null;
 
 function escapeHTML(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
@@ -19,7 +19,7 @@ function statusClass(s){return ["completed","active","answered"].includes(s)?"co
 function showLogin(){loginSection.hidden=false;dashboardSection.hidden=true;document.body.classList.add("admin-login-page");}
 function showDashboard(){loginSection.hidden=true;dashboardSection.hidden=false;document.body.classList.remove("admin-login-page");}
 function notify(msg){const n=document.createElement("div");n.className="admin-toast";n.textContent=msg;document.body.append(n);setTimeout(()=>n.remove(),3500);}
-function showPage(page){const target=$("page-"+page);if(!target)return;document.querySelectorAll(".dashboard-page").forEach(x=>x.classList.remove("active"));target.classList.add("active");document.querySelectorAll(".nav-item").forEach(x=>x.classList.toggle("active",x.dataset.page===page));$("pageTitle").textContent=pageNames[page]||"ZARO";$("sidebar").classList.remove("mobile-open");}
+function showPage(page){const target=$("page-"+page);if(!target)return;document.querySelectorAll(".dashboard-page").forEach(x=>x.classList.remove("active"));target.classList.add("active");document.querySelectorAll(".nav-item").forEach(x=>x.classList.toggle("active",x.dataset.page===page));$("pageTitle").textContent=pageNames[page]||"ZARO";$("sidebar").classList.remove("mobile-open");document.body.classList.remove("admin-menu-open");window.scrollTo({top:0,behavior:"smooth"});}
 function setLoadingRow(id,cols,msg="جاري التحميل..."){$(id).innerHTML='<tr><td colspan="'+cols+'">'+escapeHTML(msg)+'</td></tr>';}
 
 async function loadOrders(){
@@ -116,10 +116,17 @@ document.addEventListener("click",e=>{
  if(!button)return;
  const page=button.dataset.page;
  if(!page||!$("page-"+page))return;
- e.preventDefault();
- showPage(page);
+ e.preventDefault();e.stopPropagation();showPage(page);
 });
-$("mobileMenuButton").addEventListener("click",()=>$("sidebar").classList.toggle("mobile-open"));
+$("mobileMenuButton").addEventListener("click",()=>{
+ const open=$("sidebar").classList.toggle("mobile-open");
+ document.body.classList.toggle("admin-menu-open",open);
+});
+document.addEventListener("click",e=>{
+ if(window.matchMedia("(max-width: 760px)").matches && $("sidebar").classList.contains("mobile-open") && !e.target.closest("#sidebar") && !e.target.closest("#mobileMenuButton")){
+  $("sidebar").classList.remove("mobile-open");document.body.classList.remove("admin-menu-open");
+ }
+});
 $("refreshButton").addEventListener("click",loadAll);
 $("orderSearch").addEventListener("input",renderOrders);$("orderStatusFilter").addEventListener("change",renderOrders);
 $("packageSearch").addEventListener("input",renderPackages);$("packageGameFilter").addEventListener("change",renderPackages);
