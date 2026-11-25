@@ -909,7 +909,9 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-  late Future<List<Map<String, dynamic>>> future = load();
+  late Future<List<Map<String, dynamic>>> future;
+  @override
+  void initState() { super.initState(); future = load(); }
   Future<List<Map<String, dynamic>>> load() async {
     final uid = widget.user?.id;
     if (uid == null) return [];
@@ -940,7 +942,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
             onTap: n['read_at'] == null ? () => markRead(n['id'].toString()) : null,
             leading: Icon(n['read_at'] == null ? Icons.notifications_active : Icons.notifications_none, color: n['read_at'] == null ? yellow : muted),
             title: Text(n['title']?.toString() ?? 'إشعار', style: const TextStyle(color: white, fontWeight: FontWeight.bold)),
-            subtitle: Text((n['body']?.toString() ?? '') + '\\n' + (n['created_at']?.toString() ?? ''), style: const TextStyle(color: muted, height: 1.5)),
+            subtitle: Text((n['body']?.toString() ?? '') + '\n' + (n['created_at']?.toString() ?? ''), style: const TextStyle(color: muted, height: 1.5)),
             trailing: n['read_at'] == null ? const Text('جديد', style: TextStyle(color: yellow, fontSize: 11)) : null,
           ),
         )).toList());
