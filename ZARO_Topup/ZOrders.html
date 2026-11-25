@@ -55,89 +55,94 @@
     </button>
 </main>
 
-<script>
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+const supabase = createClient("https://rtqdcbkttrxbmglzllmv.supabase.co", "sb_publishable_iqwtKiJMmx9QEO4l1Zo7iQ_kHvZZH0c");
 const ordersList = document.getElementById("ordersList");
 const emptyOrders = document.getElementById("emptyOrders");
 const totalOrders = document.getElementById("totalOrders");
 const demoOrders = document.getElementById("demoOrders");
 const clearOrders = document.getElementById("clearOrders");
 
-function loadOrders() {
-    let orders = [];
+function renderOrders(orders, remote) {
+  ordersList.innerHTML = "";
+  totalOrders.textContent = orders.length;
+  demoOrders.textContent = orders.filter(order => (order.status || "") === "demo" || (order.status || "") === "طلب تجريبي").length;
+  emptyOrders.hidden = orders.length !== 0;
+  clearOrders.hidden = remote || orders.length === 0;
 
-    try {
-        orders = JSON.parse(localStorage.getItem("zaroOrders") || "[]");
-        if (!Array.isArray(orders)) orders = [];
-    } catch (error) {
-        orders = [];
+  orders.forEach((order, index) => {
+    const card = document.createElement("article");
+    card.className = "order-card";
+    const details = document.createElement("div");
+    details.className = "order-card-details";
+    const title = document.createElement("h3");
+    title.textContent = order.game || "لعبة غير محددة";
+    const packageInfo = document.createElement("p");
+    packageInfo.textContent = "الباقة: " + (order.package || "غير محددة");
+    const playerInfo = document.createElement("p");
+    playerInfo.textContent = "Player ID: " + (order.player_id || order.playerId || "غير متوفر");
+    details.append(title, packageInfo, playerInfo);
+    if (order.zone_id || order.zoneId) {
+      const zoneInfo = document.createElement("p");
+      zoneInfo.textContent = "Zone ID: " + (order.zone_id || order.zoneId);
+      details.appendChild(zoneInfo);
     }
+    const priceInfo = document.createElement("p");
+    priceInfo.textContent = "السعر: " + (order.amount ?? order.price ?? "تجريبي");
+    const status = document.createElement("span");
+    status.className = "order-status";
+    status.textContent = ({demo:"طلب تجريبي",pending:"قيد الانتظار",completed:"مكتمل",rejected:"مرفوض"}[order.status] || order.status || "طلب تجريبي");
+    const date = document.createElement("small");
+    date.textContent = order.created_at ? new Date(order.created_at).toLocaleString("ar-EG") : (order.date || "");
+    card.append(details, priceInfo, status, date);
 
-    ordersList.innerHTML = "";
+    if (!remote) {
+      const removeButton = document.createElement("button");
+      removeButton.className = "remove-order";
+      removeButton.textContent = "حذف الطلب";
+      removeButton.addEventListener("click", () => {
+        const updatedOrders = JSON.parse(localStorage.getItem("zaroOrders") || "[]");
+        updatedOrders.splice(index, 1);
+        localStorage.setItem("zaroOrders", JSON.stringify(updatedOrders));
+        loadOrders();
+      });
+      card.appendChild(removeButton);
+    }
+    ordersList.appendChild(card);
+  });
+}
 
-    totalOrders.textContent = orders.length;
-    demoOrders.textContent = orders.length;
-
-    emptyOrders.hidden = orders.length !== 0;
-    clearOrders.hidden = orders.length === 0;
-
-    orders.forEach((order, index) => {
-        const card = document.createElement("article");
-        card.className = "order-card";
-
-        const details = document.createElement("div");
-        details.className = "order-card-details";
-
-        const title = document.createElement("h3");
-        title.textContent = order.game || "لعبة غير محددة";
-
-        const packageInfo = document.createElement("p");
-        packageInfo.textContent = "الباقة: " + (order.package || "غير محددة");
-
-        const playerInfo = document.createElement("p");
-        playerInfo.textContent = "Player ID: " + (order.playerId || "غير متوفر");
-
-        details.append(title, packageInfo, playerInfo);
-
-        if (order.zoneId) {
-            const zoneInfo = document.createElement("p");
-            zoneInfo.textContent = "Zone ID: " + order.zoneId;
-            details.appendChild(zoneInfo);
-        }
-
-        const priceInfo = document.createElement("p");
-        priceInfo.textContent = "السعر: " + (order.price || "تجريبي");
-
-        const status = document.createElement("span");
-        status.className = "order-status";
-        status.textContent = order.status || "طلب تجريبي";
-
-        const date = document.createElement("small");
-        date.textContent = order.date || "";
-
-        const removeButton = document.createElement("button");
-        removeButton.className = "remove-order";
-        removeButton.textContent = "حذف الطلب";
-        removeButton.addEventListener("click", () => {
-            const updatedOrders = JSON.parse(
-                localStorage.getItem("zaroOrders") || "[]"
-            );
-            updatedOrders.splice(index, 1);
-            localStorage.setItem("zaroOrders", JSON.stringify(updatedOrders));
-            loadOrders();
-        });
-
-        card.append(details, priceInfo, status, date, removeButton);
-        ordersList.appendChild(card);
-    });
+async function loadOrders() {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const { data, error } = await supabase.from("orders")
+        .select("id,game,package,player_id,zone_id,amount,status,created_at")
+        .eq("user_id", session.user.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      renderOrders(data || [], true);
+      return;
+    }
+    let localOrders = [];
+    try {
+      localOrders = JSON.parse(localStorage.getItem("zaroOrders") || "[]");
+      if (!Array.isArray(localOrders)) localOrders = [];
+    } catch (_) { localOrders = []; }
+    renderOrders(localOrders, false);
+  } catch (error) {
+    ordersList.innerHTML = "<p>تعذر تحميل الطلبات. سجّل الدخول مرة أخرى أو حدّث الصفحة.</p>";
+    console.error("ZARO orders error:", error);
+  }
 }
 
 clearOrders.addEventListener("click", () => {
-    if (confirm("متأكد إنك عايز تمسح كل الطلبات؟")) {
-        localStorage.removeItem("zaroOrders");
-        loadOrders();
-    }
+  if (confirm("متأكد إنك عايز تمسح كل الطلبات المحلية؟")) {
+    localStorage.removeItem("zaroOrders");
+    loadOrders();
+  }
 });
-
 loadOrders();
 </script>
 
