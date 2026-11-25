@@ -1,0 +1,47 @@
+name: Build ZARO Admin for Windows
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'ZARO_Topup/desktop-admin/**'
+      - 'ZARO_Topup/zaro-app-icon.svg'
+      - '.github/workflows/desktop-admin.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: ZARO_Topup/desktop-admin
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ZARO_Topup/desktop-admin/package.json
+
+      - name: Create Windows app icon
+        shell: pwsh
+        run: magick "../zaro-app-icon.svg" -define icon:auto-resize=256,128,64,48,32,16 "zaro-admin.ico"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Windows installer
+        run: npm run dist
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZARO-Admin-Windows-Installer
+          path: ZARO_Topup/desktop-admin/dist/*.exe
+          if-no-files-found: error
+          retention-days: 14
