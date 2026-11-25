@@ -121,7 +121,7 @@ async function loadPlatformControl(){
  for(const [name,res] of [["الإصدارات",versions],["العروض",promotions],["المميزات",flags],["الإعدادات",settings],["المحافظ",wallets],["الأجهزة",devices],["السجل",audits],["الحسابات",profiles]]) if(res.error) throw new Error(name+": "+res.error.message);
  const profileMap=new Map((profiles.data||[]).map(p=>[p.user_id,p]));
  $("versionsList").innerHTML=(versions.data||[]).map(v=>'<p>'+escapeHTML(v.version_name)+' · build '+v.build_number+(v.is_mandatory?' · إجباري':'')+' · '+(v.is_active?'نشط':'متوقف')+'</p>').join("")||"لا توجد إصدارات مسجلة.";
- $("promotionsList").innerHTML=(promotions.data||[]).map(p=>'<p>'+escapeHTML(p.title)+' · '+escapeHTML(p.code||"بدون كود")+' · '+(p.is_active?'نشط':'متوقف')+'</p>').join("")||"لا توجد عروض.";
+ $("promotionsList").innerHTML=(promotions.data||[]).map(p=>'<div class="promotion-admin-row" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #ffffff18"><span>'+escapeHTML(p.title)+' · '+escapeHTML(p.code||"بدون كود")+' · '+(p.is_active?'نشط':'متوقف')+'</span><button class="mini-button promotion-toggle" data-id="'+p.id+'" data-active="'+p.is_active+'">'+(p.is_active?'إيقاف':'تفعيل')+'</button></div>').join("")||"لا توجد عروض.";
  $("featureFlagsList").innerHTML=(flags.data||[]).map(f=>'<label style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" class="feature-flag-toggle" data-key="'+escapeHTML(f.flag_key)+'" '+(f.enabled?'checked':'')+'> '+escapeHTML(f.flag_key)+'</label>').join("")||"لا توجد مفاتيح مميزات.";
  $("appSettingsList").innerHTML=(settings.data||[]).map(s=>{
   if(s.setting_key==="maintenance_mode") return '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" class="app-setting-toggle" data-key="maintenance_mode" '+(s.setting_value===true?'checked':'')+'> وضع الصيانة</label>';
@@ -255,6 +255,13 @@ $("notificationForm")?.addEventListener("submit",async e=>{
  if(error){notify("تعذر إرسال الإشعار: "+error.message);return;}
  await supabase.from("app_audit_logs").insert({actor_user_id:currentUser.id,action:"send_notification",entity_type:"notification",details:{target:zaroId||"all"}});
  e.target.reset();notify("تم حفظ الإشعار داخل مركز إشعارات التطبيق.");await loadPlatformControl();
+});
+$("promotionsList")?.addEventListener("click",async e=>{
+ const b=e.target.closest(".promotion-toggle");if(!b)return;
+ const next=b.dataset.active!=="true";b.disabled=true;
+ const {error}=await supabase.from("app_promotions").update({is_active:next,updated_at:new Date().toISOString()}).eq("id",b.dataset.id);
+ if(error){notify("تعذر تحديث العرض: "+error.message);b.disabled=false;return;}
+ notify(next?"تم تفعيل العرض.":"تم إيقاف العرض.");await loadPlatformControl();
 });
 $("promotionForm")?.addEventListener("submit",async e=>{
  e.preventDefault();const {error}=await supabase.from("app_promotions").insert({code:$("promotionCode").value.trim().toUpperCase()||null,title:$("promotionTitle").value.trim(),discount_type:$("promotionType").value,discount_value:Number($("promotionValue").value),is_active:true});
