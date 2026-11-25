@@ -108,20 +108,26 @@ async function openTicket(id){
 
 
 async function loadPlatformControl(){
- const [versions, promotions, flags, wallets, devices, audits, profiles] = await Promise.all([
+ const [versions, promotions, flags, settings, wallets, devices, audits, profiles] = await Promise.all([
   supabase.from("app_versions").select("*").eq("platform","android").order("build_number",{ascending:false}).limit(8),
   supabase.from("app_promotions").select("*").order("created_at",{ascending:false}).limit(8),
   supabase.from("app_feature_flags").select("*").order("flag_key"),
+  supabase.from("app_settings").select("*").order("setting_key"),
   supabase.from("app_wallets").select("*").order("updated_at",{ascending:false}).limit(100),
   supabase.from("app_devices").select("platform,device_label,app_build,last_seen_at").order("last_seen_at",{ascending:false}).limit(30),
   supabase.from("app_audit_logs").select("*").order("created_at",{ascending:false}).limit(30),
   supabase.from("app_profiles").select("user_id,zaro_id,display_name").order("created_at",{ascending:false}).limit(500)
  ]);
- for(const [name,res] of [["الإصدارات",versions],["العروض",promotions],["المميزات",flags],["المحافظ",wallets],["الأجهزة",devices],["السجل",audits],["الحسابات",profiles]]) if(res.error) throw new Error(name+": "+res.error.message);
+ for(const [name,res] of [["الإصدارات",versions],["العروض",promotions],["المميزات",flags],["الإعدادات",settings],["المحافظ",wallets],["الأجهزة",devices],["السجل",audits],["الحسابات",profiles]]) if(res.error) throw new Error(name+": "+res.error.message);
  const profileMap=new Map((profiles.data||[]).map(p=>[p.user_id,p]));
  $("versionsList").innerHTML=(versions.data||[]).map(v=>'<p>'+escapeHTML(v.version_name)+' · build '+v.build_number+(v.is_mandatory?' · إجباري':'')+' · '+(v.is_active?'نشط':'متوقف')+'</p>').join("")||"لا توجد إصدارات مسجلة.";
  $("promotionsList").innerHTML=(promotions.data||[]).map(p=>'<p>'+escapeHTML(p.title)+' · '+escapeHTML(p.code||"بدون كود")+' · '+(p.is_active?'نشط':'متوقف')+'</p>').join("")||"لا توجد عروض.";
  $("featureFlagsList").innerHTML=(flags.data||[]).map(f=>'<label style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" class="feature-flag-toggle" data-key="'+escapeHTML(f.flag_key)+'" '+(f.enabled?'checked':'')+'> '+escapeHTML(f.flag_key)+'</label>').join("")||"لا توجد مفاتيح مميزات.";
+ $("appSettingsList").innerHTML=(settings.data||[]).map(s=>{
+  if(s.setting_key==="maintenance_mode") return '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" class="app-setting-toggle" data-key="maintenance_mode" '+(s.setting_value===true?'checked':'')+'> وضع الصيانة</label>';
+  return '<p>'+escapeHTML(s.setting_key)+': '+escapeHTML(JSON.stringify(s.setting_value))+'</p>';
+ }).join("")||"لا توجد إعدادات.";
+
  $("walletsTable").innerHTML=(wallets.data||[]).map(w=>{const p=profileMap.get(w.user_id)||{};return '<tr><td>'+escapeHTML(p.zaro_id||"—")+'</td><td>'+escapeHTML(p.display_name||"عميل")+'</td><td>'+money(w.balance)+'</td><td><input class="wallet-delta" type="number" step="0.01" placeholder="+/-"></td><td><input class="wallet-reason" placeholder="سبب التعديل"></td><td><button class="mini-button save-wallet" data-id="'+w.user_id+'">حفظ</button></td></tr>'}).join("")||'<tr><td colspan="6">لا توجد محافظ مسجلة.</td></tr>';
  $("devicesTable").innerHTML=(devices.data||[]).map(d=>'<tr><td>'+escapeHTML(d.platform)+'</td><td>'+escapeHTML(d.device_label||"غير محدد")+'</td><td>'+escapeHTML(d.app_build??"—")+'</td><td>'+date(d.last_seen_at)+'</td></tr>').join("")||'<tr><td colspan="4">لا توجد أجهزة مسجلة.</td></tr>';
  $("auditTable").innerHTML=(audits.data||[]).map(a=>'<tr><td>'+escapeHTML(a.action)+'</td><td>'+escapeHTML(a.entity_type)+'</td><td>'+escapeHTML(a.entity_id||"—")+'</td><td>'+escapeHTML(JSON.stringify(a.details))+'</td><td>'+date(a.created_at)+'</td></tr>').join("")||'<tr><td colspan="5">لا توجد عمليات مسجلة.</td></tr>';
@@ -253,6 +259,11 @@ $("notificationForm")?.addEventListener("submit",async e=>{
 $("promotionForm")?.addEventListener("submit",async e=>{
  e.preventDefault();const {error}=await supabase.from("app_promotions").insert({code:$("promotionCode").value.trim().toUpperCase()||null,title:$("promotionTitle").value.trim(),discount_type:$("promotionType").value,discount_value:Number($("promotionValue").value),is_active:true});
  if(error){notify("تعذر إنشاء العرض: "+error.message);return;}e.target.reset();notify("تم إنشاء العرض. تطبيق الخصم على الطلبات يحتاج ربطًا بمسار الدفع.");await loadPlatformControl();
+});
+$("appSettingsList")?.addEventListener("change",async e=>{
+ const box=e.target.closest(".app-setting-toggle");if(!box)return;
+ const {error}=await supabase.from("app_settings").update({setting_value:box.checked,updated_at:new Date().toISOString(),updated_by:currentUser.id}).eq("setting_key",box.dataset.key);
+ if(error){notify("تعذر تحديث الإعداد: "+error.message);box.checked=!box.checked;}else notify("تم تحديث إعداد المنصة.");
 });
 $("featureFlagsList")?.addEventListener("change",async e=>{
  const box=e.target.closest(".feature-flag-toggle");if(!box)return;
