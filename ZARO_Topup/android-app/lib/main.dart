@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 const bg = Color(0xFF070707);
 const panel = Color(0xFF151515);
@@ -8,6 +9,8 @@ const yellow = Color(0xFFFFC400);
 const white = Color(0xFFF7F7F7);
 const muted = Color(0xFFB9B9B9);
 final supabase = Supabase.instance.client;
+const int zaroBuildNumber = 3;
+const String zaroVersionName = '1.0.2';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -70,6 +73,51 @@ class _ZaroShellState extends State<ZaroShell> {
   void initState() {
     super.initState();
     user = supabase.auth.currentUser;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkForUpdates());
+  }
+
+  Future<void> _checkForUpdates() async {
+    try {
+      final row = await supabase.from('app_versions')
+          .select('version_name,build_number,min_supported_build,download_url,release_notes,is_mandatory')
+          .eq('platform', 'android').eq('is_active', true).eq('is_latest', true)
+          .order('build_number', ascending: false).limit(1).maybeSingle();
+      if (!mounted || row == null) return;
+      final latestBuild = (row['build_number'] as num?)?.toInt() ?? 0;
+      final minimumBuild = (row['min_supported_build'] as num?)?.toInt() ?? 1;
+      if (latestBuild <= zaroBuildNumber) return;
+      final mandatory = row['is_mandatory'] == true || zaroBuildNumber < minimumBuild;
+      final notes = row['release_notes'] is Map
+          ? ((row['release_notes'] as Map)['ar'] ?? '').toString() : '';
+      final urlText = (row['download_url'] ?? '').toString();
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: !mandatory,
+        builder: (dialogContext) => AlertDialog(
+          backgroundColor: panel,
+          title: Text(mandatory ? 'تحديث مطلوب' : 'تحديث جديد متاح',
+              style: const TextStyle(color: yellow, fontWeight: FontWeight.w900)),
+          content: Text('الإصدار ' + row['version_name'].toString() + ' متاح الآن.\n' + notes,
+              style: const TextStyle(color: white, height: 1.7)),
+          actions: [
+            if (!mandatory)
+              TextButton(onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text('لاحقًا')),
+            FilledButton(
+              onPressed: urlText.isEmpty ? null : () async {
+                final uri = Uri.tryParse(urlText);
+                if (uri != null && (uri.scheme == 'https' || uri.scheme == 'http')) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
+              },
+              child: const Text('تحديث التطبيق'),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      debugPrint('ZARO update check failed: $e');
+    }
   }
 
   @override
@@ -431,7 +479,9 @@ class _AccountPageState extends State<AccountPage> {
     final uid = widget.user!.id;
     final customer = await supabase.from('customer_profiles').select('zaro_id,full_name,email,status,created_at').eq('user_id', uid).maybeSingle();
     final app = await supabase.from('app_profiles').select('rank_code,points,lifetime_spend').eq('user_id', uid).maybeSingle();
-    return {'customer': customer, 'app': app};
+    final wallet = await supabase.from('app_wallets').select('balance,currency_code').eq('user_id', uid).maybeSingle();
+    final notifications = await supabase.from('app_notifications').select('id,title,body,created_at,read_at').or('user_id.eq.$uid,user_id.is.null').order('created_at', ascending: false).limit(8);
+    return {'customer': customer, 'app': app, 'wallet': wallet, 'notifications': notifications};
   }
 
   Future<void> login() async {
@@ -524,6 +574,8 @@ class _AccountPageState extends State<AccountPage> {
         if (snapshot.hasError) return Center(child: Text('تعذر تحميل الحساب: ' + snapshot.error.toString(), textAlign: TextAlign.center));
         final customer = snapshot.data?['customer'] as Map<String, dynamic>?;
         final app = snapshot.data?['app'] as Map<String, dynamic>?;
+        final wallet = snapshot.data?['wallet'] as Map<String, dynamic>?;
+        final notifications = (snapshot.data?['notifications'] as List<dynamic>? ?? const []);
         final status = (customer?['status'] ?? 'pending').toString();
         final rank = (app?['rank_code'] ?? 'rookie').toString().toUpperCase();
         return ListView(padding: const EdgeInsets.all(20), children: [
@@ -550,6 +602,29 @@ class _AccountPageState extends State<AccountPage> {
           ]),
           const SizedBox(height: 12),
           _statCard('إجمالي مشترياتك', (app?['lifetime_spend'] ?? 0).toString() + ' ج.م'),
+          const SizedBox(height: 10),
+          _statCard('محفظة ZARO', (wallet?['balance'] ?? 0).toString() + ' ج.م'),
+          const SizedBox(height: 18),
+          const Text('إشعارات ZARO', style: TextStyle(color: yellow, fontSize: 17, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 8),
+          if (notifications.isEmpty)
+            const _InfoPanel(text: 'مفيش إشعارات جديدة حاليًا.')
+          else
+            ...notifications.map((raw) {
+              final n = Map<String, dynamic>.from(raw as Map);
+              return Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.all(13),
+                decoration: BoxDecoration(color: panel, borderRadius: BorderRadius.circular(12), border: Border.all(color: orange.withOpacity(.25))),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(n['title']?.toString() ?? 'إشعار', style: const TextStyle(color: yellow, fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 4),
+                  Text(n['body']?.toString() ?? '', style: const TextStyle(color: white, height: 1.5)),
+                  const SizedBox(height: 4),
+                  Text(n['created_at']?.toString() ?? '', style: const TextStyle(color: muted, fontSize: 10)),
+                ]),
+              );
+            }),
           const SizedBox(height: 18),
           _actionButton('تسجيل الخروج', () async { await supabase.auth.signOut(); if (mounted) setState(() {}); }),
         ]);
