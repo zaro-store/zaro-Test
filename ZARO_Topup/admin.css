@@ -784,3 +784,102 @@ button,input,select,textarea{font-family:inherit}
 .app-management-card p{font-size:11px;color:#999;line-height:1.9;margin:6px 0 10px}
 .app-state{display:inline-block;font-size:10px;color:#ffc857}
 @media(max-width:760px){.sidebar{z-index:1000;max-height:100dvh;overflow-y:auto;overscroll-behavior:contain}.sidebar-nav{padding-bottom:12px}.nav-item{min-height:46px;touch-action:manipulation}.mobile-menu-button{position:relative;z-index:1001;touch-action:manipulation}.dashboard-main{position:relative;z-index:1}.app-management-grid{grid-template-columns:1fr}}
+
+/* ZARO immersive command-center skin */
+:root{
+ --panel:rgba(17,17,19,.84);
+ --panel-light:rgba(25,24,24,.9);
+ --border:rgba(255,255,255,.085);
+}
+html{background:#070707}
+body{
+ background:
+  radial-gradient(ellipse at 78% 8%,rgba(255,91,22,.12),transparent 34%),
+  radial-gradient(ellipse at 8% 72%,rgba(255,132,54,.075),transparent 32%),
+  linear-gradient(135deg,#070707 0%,#0c0b0a 48%,#080808 100%);
+ background-attachment:fixed;
+}
+body:before{
+ content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.22;
+ background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+ background-size:42px 42px;
+ mask-image:linear-gradient(to bottom,black,transparent 88%);
+}
+body:after{
+ content:"";position:fixed;width:360px;height:360px;right:-180px;top:25%;border-radius:50%;
+ background:rgba(255,91,22,.10);filter:blur(100px);pointer-events:none;z-index:0;
+ animation:zaroAmbient 11s ease-in-out infinite alternate;
+}
+@keyframes zaroAmbient{from{transform:translate3d(0,-20px,0) scale(.85);opacity:.55}to{transform:translate3d(-55px,55px,0) scale(1.2);opacity:1}}
+.dashboard,.dashboard-main,.sidebar{position:relative;z-index:1}
+.sidebar{
+ background:linear-gradient(180deg,rgba(18,17,16,.97),rgba(8,8,8,.98));
+ border-left-color:rgba(255,112,42,.17);
+ box-shadow:0 0 55px rgba(0,0,0,.32);
+ backdrop-filter:blur(18px);
+}
+.sidebar-logo{ text-shadow:0 0 26px rgba(255,91,22,.18) }
+.admin-profile{border-color:rgba(255,255,255,.07)}
+.nav-item{border-radius:12px}
+.nav-item.active{
+ background:linear-gradient(100deg,rgba(255,91,22,.19),rgba(255,91,22,.045));
+ box-shadow:inset -3px 0 0 var(--orange),0 5px 22px rgba(255,91,22,.07);
+}
+.dashboard-main{isolation:isolate}
+.topbar{
+ padding:15px 18px;border:1px solid rgba(255,255,255,.07);border-radius:17px;
+ background:rgba(17,17,18,.66);backdrop-filter:blur(16px);
+ box-shadow:0 12px 35px rgba(0,0,0,.18);
+}
+.welcome-banner{
+ position:relative;
+ background:
+  radial-gradient(ellipse at 78% 50%,rgba(255,91,22,.25),transparent 34%),
+  linear-gradient(115deg,rgba(30,20,15,.96),rgba(15,14,14,.94) 58%,rgba(28,15,10,.96));
+ box-shadow:inset 0 1px rgba(255,255,255,.06),0 18px 45px rgba(0,0,0,.22);
+}
+.welcome-banner:after{
+ content:"Z";position:absolute;left:8%;top:50%;transform:translateY(-50%) rotate(-12deg);
+ font-family:Orbitron,sans-serif;font-size:190px;font-weight:900;line-height:1;
+ color:rgba(255,111,42,.045);text-shadow:0 0 45px rgba(255,91,22,.09);pointer-events:none;
+}
+.welcome-banner>div{position:relative;z-index:1}
+.welcome-icon{filter:drop-shadow(0 0 22px rgba(255,91,22,.32));animation:zaroFloat 5s ease-in-out infinite}
+@keyframes zaroFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.stat-card,.content-card,.game-admin-card,.app-management-card,.setting-tile{
+ background:linear-gradient(145deg,rgba(27,26,25,.91),rgba(13,13,14,.91));
+ border-color:rgba(255,255,255,.075);
+ box-shadow:0 12px 34px rgba(0,0,0,.16),inset 0 1px rgba(255,255,255,.035);
+ backdrop-filter:blur(12px);
+}
+.stat-card{position:relative;overflow:hidden}
+.stat-card:after{
+ content:"";position:absolute;top:0;right:18px;width:72px;height:2px;
+ background:linear-gradient(90deg,transparent,var(--orange),transparent);opacity:.75;
+}
+.stat-card:hover,.game-admin-card:hover,.app-management-card:hover,.setting-tile:hover{
+ transform:translateY(-3px);border-color:rgba(255,112,42,.28);
+ box-shadow:0 16px 38px rgba(0,0,0,.24),0 0 24px rgba(255,91,22,.055);
+}
+.stat-card,.game-admin-card,.app-management-card,.setting-tile{transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+.content-card{border-radius:18px}
+.section-heading{position:relative}
+.section-heading>div>span{letter-spacing:2.2px;text-shadow:0 0 15px rgba(255,91,22,.22)}
+th{background:rgba(255,91,22,.065);border-bottom:1px solid rgba(255,91,22,.13)}
+tbody tr{transition:background .2s ease}
+tbody tr:hover{background:rgba(255,91,22,.045)}
+.refresh-button,.mini-button,.view-all-button{transition:transform .2s ease,box-shadow .2s ease,background .2s ease}
+.refresh-button:hover,.mini-button:hover,.view-all-button:hover{transform:translateY(-2px);box-shadow:0 7px 20px rgba(255,91,22,.12)}
+.order-status{box-shadow:inset 0 0 0 1px rgba(255,255,255,.035)}
+.admin-toast{backdrop-filter:blur(15px);box-shadow:0 16px 45px rgba(0,0,0,.45),0 0 20px rgba(255,91,22,.08)}
+@media(max-width:760px){
+ .topbar{padding:12px 11px;border-radius:14px}
+ .welcome-banner{border-radius:16px}
+ .welcome-banner:after{font-size:130px;left:2%}
+ .stat-card{min-height:150px}
+ .content-card{border-radius:15px}
+ .sidebar{background:linear-gradient(180deg,rgba(19,17,16,.99),rgba(7,7,7,.99))}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
+}
