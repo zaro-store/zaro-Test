@@ -207,7 +207,7 @@ class HomePage extends StatelessWidget {
         child: Row(children: [
           SizedBox(width: 145, height: 65, child: Image.asset('assets/zaro-logo.png', fit: BoxFit.contain, errorBuilder: (_, __, ___) => const Text('ZARO', style: TextStyle(fontSize: 32, color: orange, fontWeight: FontWeight.w900)))),
           const Spacer(),
-          _roundButton(context, Icons.notifications_none_rounded, () => Navigator.push(context, MaterialPageRoute(builder: (_) => NotificationsPage(arabic: arabic)))),
+          _roundButton(context, Icons.notifications_none_rounded, () => Navigator.push(context, MaterialPageRoute(builder: (_) => NotificationsPage(arabic: arabic, user: user)))),
           const SizedBox(width: 9),
           _roundButton(context, Icons.person_outline_rounded, onAccount),
           const SizedBox(width: 9),
@@ -480,8 +480,9 @@ class _AccountPageState extends State<AccountPage> {
     final customer = await supabase.from('customer_profiles').select('zaro_id,full_name,email,status,created_at').eq('user_id', uid).maybeSingle();
     final app = await supabase.from('app_profiles').select('rank_code,points,lifetime_spend').eq('user_id', uid).maybeSingle();
     final wallet = await supabase.from('app_wallets').select('balance,currency_code').eq('user_id', uid).maybeSingle();
+    final walletLedger = await supabase.from('app_wallet_ledger').select('id,amount_delta,currency_code,transaction_type,description,created_at').eq('user_id', uid).order('created_at', ascending: false).limit(10);
     final notifications = await supabase.from('app_notifications').select('id,title,body,created_at,read_at').or('user_id.eq.$uid,user_id.is.null').order('created_at', ascending: false).limit(8);
-    return {'customer': customer, 'app': app, 'wallet': wallet, 'notifications': notifications};
+    return {'customer': customer, 'app': app, 'wallet': wallet, 'walletLedger': walletLedger, 'notifications': notifications};
   }
 
   Future<void> login() async {
@@ -575,6 +576,7 @@ class _AccountPageState extends State<AccountPage> {
         final customer = snapshot.data?['customer'] as Map<String, dynamic>?;
         final app = snapshot.data?['app'] as Map<String, dynamic>?;
         final wallet = snapshot.data?['wallet'] as Map<String, dynamic>?;
+        final walletLedger = (snapshot.data?['walletLedger'] as List<dynamic>? ?? const []);
         final notifications = (snapshot.data?['notifications'] as List<dynamic>? ?? const []);
         final status = (customer?['status'] ?? 'pending').toString();
         final rank = (app?['rank_code'] ?? 'rookie').toString().toUpperCase();
@@ -604,6 +606,22 @@ class _AccountPageState extends State<AccountPage> {
           _statCard('إجمالي مشترياتك', (app?['lifetime_spend'] ?? 0).toString() + ' ج.م'),
           const SizedBox(height: 10),
           _statCard('محفظة ZARO', (wallet?['balance'] ?? 0).toString() + ' ج.م'),
+          const SizedBox(height: 12),
+          const Text('آخر حركات المحفظة', style: TextStyle(color: yellow, fontSize: 17, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 8),
+          if (walletLedger.isEmpty) const _InfoPanel(text: 'لا توجد حركات مالية مسجلة.'),
+          ...walletLedger.map((raw) {
+            final item = Map<String, dynamic>.from(raw as Map);
+            final delta = (item['amount_delta'] as num?)?.toDouble() ?? 0;
+            final positive = delta >= 0;
+            return ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+              leading: Icon(positive ? Icons.add_circle_outline : Icons.remove_circle_outline, color: positive ? Colors.greenAccent : Colors.redAccent),
+              title: Text(item['description']?.toString() ?? 'حركة محفظة', style: const TextStyle(color: white, fontSize: 13)),
+              subtitle: Text(item['created_at']?.toString() ?? '', style: const TextStyle(color: muted, fontSize: 10)),
+              trailing: Text((positive ? '+' : '') + delta.toStringAsFixed(2) + ' ج.م', style: TextStyle(color: positive ? Colors.greenAccent : Colors.redAccent, fontWeight: FontWeight.bold)),
+            );
+          }),
           const SizedBox(height: 18),
           const Text('إشعارات ZARO', style: TextStyle(color: yellow, fontSize: 17, fontWeight: FontWeight.w900)),
           const SizedBox(height: 8),
@@ -831,13 +849,52 @@ class _SupportConversationPageState extends State<SupportConversationPage> {
   );
 }
 
-class NotificationsPage extends StatelessWidget {
+class NotificationsPage extends StatefulWidget {
   final bool arabic;
-  const NotificationsPage({super.key, required this.arabic});
+  final User? user;
+  const NotificationsPage({super.key, required this.arabic, required this.user});
+  @override
+  State<NotificationsPage> createState() => _NotificationsPageState();
+}
+
+class _NotificationsPageState extends State<NotificationsPage> {
+  late Future<List<Map<String, dynamic>>> future = load();
+  Future<List<Map<String, dynamic>>> load() async {
+    final uid = widget.user?.id;
+    if (uid == null) return [];
+    final rows = await supabase.from('app_notifications').select('id,title,body,created_at,read_at').or('user_id.eq.$uid,user_id.is.null').order('created_at', ascending: false).limit(50);
+    return List<Map<String, dynamic>>.from(rows);
+  }
+  Future<void> markRead(String id) async {
+    try {
+      await supabase.rpc('zaro_app_mark_notification_read', params: {'p_notification_id': id});
+      if (mounted) setState(() { future = load(); });
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تعذر تحديث الإشعار: $e')));
+    }
+  }
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(arabic ? 'الإشعارات' : 'Notifications')),
-    body: const Center(child: _InfoPanel(text: 'تحديثات الطلبات وردود الدعم هتظهر هنا بعد تفعيل نظام الإشعارات.')),
+    appBar: AppBar(title: Text(widget.arabic ? 'الإشعارات' : 'Notifications')),
+    body: widget.user == null ? const _LoginPrompt() : FutureBuilder<List<Map<String, dynamic>>>(
+      future: future,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator(color: orange));
+        if (snapshot.hasError) return Center(child: Text('تعذر تحميل الإشعارات: ${snapshot.error}'));
+        final rows = snapshot.data ?? [];
+        if (rows.isEmpty) return const Center(child: _InfoPanel(text: 'مفيش إشعارات حاليًا.'));
+        return ListView(padding: const EdgeInsets.all(16), children: rows.map((n) => Card(
+          color: panel,
+          child: ListTile(
+            onTap: n['read_at'] == null ? () => markRead(n['id'].toString()) : null,
+            leading: Icon(n['read_at'] == null ? Icons.notifications_active : Icons.notifications_none, color: n['read_at'] == null ? yellow : muted),
+            title: Text(n['title']?.toString() ?? 'إشعار', style: const TextStyle(color: white, fontWeight: FontWeight.bold)),
+            subtitle: Text((n['body']?.toString() ?? '') + '\\n' + (n['created_at']?.toString() ?? ''), style: const TextStyle(color: muted, height: 1.5)),
+            trailing: n['read_at'] == null ? const Text('جديد', style: TextStyle(color: yellow, fontSize: 11)) : null,
+          ),
+        )).toList());
+      },
+    ),
   );
 }
 
