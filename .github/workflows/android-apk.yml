@@ -1,14 +1,10 @@
-name: Build ZARO Android APK
+name: Build ZARO Android Release
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'ZARO_Topup/android-app/**'
-      - '.github/workflows/android-apk.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -35,10 +31,29 @@ jobs:
       - name: Build release APK
         working-directory: ZARO_Topup/android-app
         run: flutter build apk --release
-      - name: Upload APK
+      - name: Prepare release metadata
+        id: release
+        working-directory: ZARO_Topup/android-app
+        run: |
+          VERSION=$(sed -n 's/^version: //p' pubspec.yaml | tr -d "'")
+          TAG="zaro-android-v${VERSION}"
+          cp build/app/outputs/flutter-apk/app-release.apk zaro-android.apk
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+      - name: Publish stable APK release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "${{ steps.release.outputs.tag }}" >/dev/null 2>&1 || \
+            gh release create "${{ steps.release.outputs.tag }}" \
+              --title "ZARO Android ${{ steps.release.outputs.version }}" \
+              --notes "Official ZARO Android application release."
+          gh release upload "${{ steps.release.outputs.tag }}" \
+            ZARO_Topup/android-app/zaro-android.apk --clobber
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: zaro-android-apk
-          path: ZARO_Topup/android-app/build/app/outputs/flutter-apk/app-release.apk
+          name: ZARO-Android-Release
+          path: ZARO_Topup/android-app/zaro-android.apk
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 90
