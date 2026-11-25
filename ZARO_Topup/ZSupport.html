@@ -133,6 +133,15 @@ const supabase=createClient("https://rtqdcbkttrxbmglzllmv.supabase.co","sb_publi
 const $=id=>document.getElementById(id);
 const form=$("supportForm"), feedback=$("supportFeedback"), panel=$("customerConversation"), messages=$("customerConversationMessages"), replyForm=$("customerReplyForm"), replyInput=$("customerReply"), replyFeedback=$("customerReplyFeedback");
 const STORAGE_KEY="zaroSupportAccess"; let access=null;
+(async()=>{
+ const {data:{session}}=await supabase.auth.getSession();
+ if(!session)return;
+ const {data}=await supabase.from("customer_profiles").select("full_name,email").eq("user_id",session.user.id).maybeSingle();
+ if(data){
+  if($("supportName")&&!$("supportName").value)$("supportName").value=data.full_name||"";
+  if($("supportEmail")&&!$("supportEmail").value)$("supportEmail").value=data.email||session.user.email||"";
+ }
+})();
 const esc=v=>String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 
 const helpBotMessages = $("helpBotMessages");
