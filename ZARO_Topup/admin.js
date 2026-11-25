@@ -173,7 +173,9 @@ $("customerSearch").addEventListener("input",renderCustomers);$("customerStatusF
 
 $("allOrders").addEventListener("change",async e=>{
  const s=e.target.closest(".order-state-select");if(!s)return;const id=s.dataset.id,newStatus=s.value;
- if(newStatus==="completed"&&!confirm("هل تأكدت فعليًا من تنفيذ الشحن لدى المورد؟ لا تستخدم مكتمل لمجرد استلام صورة تحويل.")){await loadOrders();return;}
+ const order=orders.find(o=>String(o.id)===String(id));
+ if(newStatus==="completed"&&(!order||order.payment_status!=="paid"||order.fulfillment_status!=="fulfilled")){notify("لا يمكن إغلاق الطلب كمكتمل قبل تأكيد الدفع من بوابة الدفع ونجاح الشحن من المورد.");await loadOrders();return;}
+ if(newStatus==="completed"&&!confirm("تأكيد اكتمال الدفع والشحن لهذا الطلب؟")){await loadOrders();return;}
  s.disabled=true;const {error}=await supabase.from("orders").update({status:newStatus}).eq("id",id);if(error){notify("فشل تحديث الطلب: "+error.message);}else notify("تم تحديث حالة الطلب.");await loadOrders();
 });
 $("gamesGrid").addEventListener("click",async e=>{
