@@ -70,6 +70,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Platform-wide maintenance mode, controlled from the admin dashboard.
+  import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm")
+    .then(async ({ createClient }) => {
+      const client = createClient("https://rtqdcbkttrxbmglzllmv.supabase.co", "sb_publishable_iqwtKiJMmx9QEO4l1Zo7iQ_kHvZZH0c");
+      const { data, error } = await client.from("app_settings").select("setting_value").eq("setting_key", "maintenance_mode").maybeSingle();
+      if (error || data?.setting_value !== true) return;
+      const overlay = document.createElement("main");
+      overlay.setAttribute("role", "alert");
+      overlay.style.cssText = "position:fixed;inset:0;z-index:999999;background:#080808;color:#fff;display:grid;place-content:center;text-align:center;padding:28px;font-family:Cairo,sans-serif";
+      overlay.innerHTML = '<div style="color:#ff7900;font-size:34px;font-weight:900;letter-spacing:3px">ZARO.</div><h1 style="color:#ffc400">نرجعلك قريب</h1><p style="max-width:440px;line-height:2;color:#ddd">المتجر تحت الصيانة حاليًا لتحسين الخدمة. حاول مرة تانية بعد قليل.</p>';
+      document.body.appendChild(overlay);
+    })
+    .catch(error => console.warn("ZARO platform settings unavailable", error));
+
   // Current year
   document.querySelectorAll(".footer p").forEach(footer => {
     footer.textContent = footer.textContent.replace(
